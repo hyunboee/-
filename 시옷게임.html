@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시옷패밀리 집들이 게임 천국!</title>
+    <style>
+        /* 공통 스타일 및 레이아웃 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0fdf4;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        /* 탭 메뉴 스타일 */
+        #tab-menu {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background-color: #16a34a;
+            color: white;
+        }
+        .tab-btn:hover:not(.active) {
+            background-color: #f4f4f5;
+        }
+
+        /* 게임 화면 영역 */
+        .game-screen {
+            display: none;
+        }
+        .game-screen.active {
+            display: block;
+        }
+
+        /* --------------------------------------------------------------------
+           [게임 1] 장애물 피하기 스타일 (Green 테마)
+        -------------------------------------------------------------------- */
+        #game-container-1 {
+            position: relative;
+            width: 800px;
+            height: 400px;
+            background: linear-gradient(to bottom, #dcfce7, #f0fdf4);
+            border: 4px solid #16a34a;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        #char-select-1 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .select-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #16a34a;
+        }
+        .char-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 700px;
+        }
+        .char-btn {
+            background: #fff;
+            border: 3px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            text-align: center;
+            width: 90px;
+        }
+        .char-btn:hover {
+            transform: scale(1.05);
+            border-color: #16a34a;
+        }
+        .char-img-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            background: #f4f4f5;
+            border-radius: 50%;
+        }
+        .char-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
+        }
+        #character-sprite-1 {
+            position: absolute;
+            left: 50px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            z-index: 5;
+            display: none;
+            object-fit: contain;
+        }
+        #obstacle-1 {
+            position: absolute;
+            right: -60px;
+            bottom: 20px;
+            width: 50px;
+            height: 50px;
+            font-size: 45px;
+            line-height: 50px;
+            text-align: center;
+            z-index: 5;
+        }
+        #ground-1 {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 20px;
+            background-color: #16a34a;
+        }
+        #score-board-1 {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #14532d;
+            z-index: 8;
+        }
+        #game-over-1 {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            color: white;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 12;
+        }
+        #game-over-1 button, #victory-screen-2 button, #game-over-3 button {
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            background-color: #ffaa00;
+            color: #333;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        #game-over-1 button:hover, #victory-screen-2 button:hover, #game-over-3 button:hover {
+            background-color: #ffe066;
+        }
+
+        /* --------------------------------------------------------------------
+           [게임 2] 카드 뒤집기 스타일 (Purple 테마)
+        -------------------------------------------------------------------- */
+        #game-container-2 {
+            position: relative;
+            width: 600px;
+            height: 550px;
+            background: #ffffff;
+            border: 4px solid #a855f7;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 24px;
+            color: #7e22ce;
+            margin: 0 0 10px 0;
+        }
+        #status-bar-2 {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        #grid-2 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            width: 100%;
+            height: 380px;
+        }
+        .card {
+            background-color: #a855f7;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-front {
+            background-color: #fff;
+            border: 2px solid #a855f7;
+            transform: rotateY(180deg);
+        }
+        .card-front img {
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
+        }
+        .card-back {
+            background-color: #a855f7;
+            border: 2px solid #7e22ce;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-back img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+        }
+        .card.matched {
+            transform: rotateY(180deg) scale(0.95);
+            opacity: 0.6;
+            cursor: default;
+        }
+        #victory-screen-2 {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* --------------------------------------------------------------------
+           [게임 3] 선물 받기 스타일 (Pink/Red 테마)
+        -------------------------------------------------------------------- */
+        #game-container-3 {
+            position: relative;
+            width: 500px;
+            height: 600px;
+            background: linear-gradient(to bottom, #fee2e2, #fef2f2);
+            border: 4px solid #f43f5e;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        #char-select-3 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .select-title-3 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #e11d48;
+            text-align: center;
+            line-height: 1.5;
+        }
+        #basket-sprite-3 {
+            position: absolute;
+            bottom: 30px;
+            left: 215px;
+            width: 70px;
+            height: 70px;
+            z-index: 5;
+            object-fit: contain;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+        .falling-item {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            z-index: 4;
+            object-fit: contain;
+        }
+        #status-bar-3 {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            color: #e11d48;
+            z-index: 8;
+        }
+        #game-over-3 {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            color: white;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 12;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 탭 선택 메뉴 -->
+    <div id="tab-menu">
+        <button class="tab-btn active" onclick="switchTab('tab-game1')">🏃‍♂️ 장애물 피하기</button>
+        <button class="tab-btn" onclick="switchTab('tab-game2')">🎴 카드 뒤집기</button>
+        <button class="tab-btn" onclick="switchTab('tab-game3')">🎁 선물 받기</button>
+    </div>
+
+    <!-- ==========================================
+         [탭 1] 장애물 피하기 게임 영역
+         ========================================== -->
+    <div id="tab-game1" class="game-screen active">
+        <div id="game-container-1">
+            <div id="char-select-1">
+                <div class="select-title">🏡 시옷패밀리 집들이에 갈 친구를 골라줘! 🏡</div>
+                <div class="char-options">
+                    <div class="char-btn" onclick="startGame1('images/chichi.png')">
+                        <img class="char-img-preview" src="images/chichi.png" alt="치치" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🐧</text></svg>'">
+                        <div class="char-name">시옷치치</div>
+                    </div>
+                    <div class="char-btn" onclick="startGame1('images/daedae.png')">
+                        <img class="char-img-preview" src="images/daedae.png" alt="대대" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🦢</text></svg>'">
+                        <div class="char-name">시옷대대</div>
+                    </div>
+                    <div class="char-btn" onclick="startGame1('images/jaejae.png')">
+                        <img class="char-img-preview" src="images/jaejae.png" alt="재재" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🌸</text></svg>'">
+                        <div class="char-name">시옷재재</div>
+                    </div>
+                    <div class="char-btn" onclick="startGame1('images/panpan.png')">
+                        <img class="char-img-preview" src="images/panpan.png" alt="판판" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🧸</text></svg>'">
+                        <div class="char-name">시옷판판</div>
+                    </div>
+                    <div class="char-btn" onclick="startGame1('images/changchang.png')">
+                        <img class="char-img-preview" src="images/changchang.png" alt="창창" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🦖</text></svg>'">
+                        <div class="char-name">시옷창창</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="score-board-1">점수: <span id="score-1">0</span></div>
+            <img id="character-sprite-1" src="" alt="플레이어">
+            <div id="obstacle-1">🏠</div>
+            <div id="ground-1"></div>
+
+            <div id="game-over-1">
+                <h1>앗! 집들이 장애물에 부딪혔어요!</h1>
+                <p>최종 점수: <span id="final-score-1">0</span>점</p>
+                <button onclick="resetGame1()">다시 도전하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         [탭 2] 카드 뒤집기 게임 영역
+         ========================================== -->
+    <div id="tab-game2" class="game-screen">
+        <div id="game-container-2">
+            <h1>🏡 시옷패밀리 집들이 카드 매칭! 🏡</h1>
+            <div id="status-bar-2">
+                <div>시간: <span id="timer-2">0</span>초</div>
+                <div>성공한 쌍: <span id="matches-2">0</span> / 6</div>
+            </div>
+
+            <div id="grid-2"></div>
+
+            <div id="victory-screen-2">
+                <h2>🎉 미션 대성공! 🎉</h2>
+                <p>모든 시옷패밀리의 짝을 맞췄어요!</p>
+                <p>기록: <strong><span id="final-time-2">0</span>초</strong></p>
+                <button onclick="resetGame2()">다시 도전하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         [탭 3] 선물 받기 게임 영역
+         ========================================== -->
+    <div id="tab-game3" class="game-screen">
+        <div id="game-container-3">
+            <div id="char-select-3">
+                <div class="select-title-3">🎁 시옷패밀리 집들이 🎁<br>선물을 받아낼 친구를 골라줘!</div>
+                <div class="char-options">
+                    <div class="char-btn" onclick="startGame3('images/chichi.png')">
+                        <img class="char-img-preview" src="images/chichi.png" alt="치치" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🐧</text></svg>'">
+                        <div class="char-name">시옷치치</div>
+                    </div>
+                    <div class="char-btn" onclick="startGame3('images/daedae.png')">
+                        <img class="char-img-preview" src="images/daedae.png" alt="대대" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🦢</text></svg>'">
+                        <div class="char-name">시옷대대</div>
+                    </div>
+                    <div class="char-btn" onclick="startGame3('images/jaejae.png')">
+                        <img class="char-img-preview" src="images/jaejae.png" alt="재재" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🌸</text></svg>'">
+                        <div class="char-name">시옷재재</div>
+                    </div>
+                    <div class="char-btn" onclick="startGame3('images/panpan.png')">
+                        <img class="char-img-preview" src="images/panpan.png" alt="판판" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🧸</text></svg>'">
+                        <div class="char-name">시옷판판</div>
+                    </div>
+                    <div class="char-btn" onclick="startGame3('images/changchang.png')">
+                        <img class="char-img-preview" src="images/changchang.png" alt="창창" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'0.9em\' font-size=\'90\'>🦖</text></svg>'">
+                        <div class="char-name">시옷창창</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="status-bar-3">
+                <div>점수: <span id="score-3">0</span></div>
+                <div>생명: <span id="lives-3">❤️❤️❤️</span></div>
+            </div>
+
+            <img id="basket-sprite-3" src="" alt="바구니">
+
+            <div id="game-over-3">
+                <h1>게임 오버!</h1>
+                <p>시옷패밀리 집들이 파티가 안전하게 끝났습니다.</p>
+                <p>최종 점수: <strong><span id="final-score-3">0</span>점</strong></p>
+                <button onclick="resetGame3()">다시 도전하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         [스크립트 코드] 탭 관리 및 게임 로직
+         ========================================== -->
+    <script>
+        // --------------------------------------------------
+        // 0. 공통 전역 및 탭 제어
+        // --------------------------------------------------
+        function switchTab(tabId) {
+            // 다른 게임 실행 중 강제 종료 처리
+            stopAllGames();
+
+            // 탭 버튼 active 클래스 갱신
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 탭 화면 전환
+            document.querySelectorAll('.game-screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            // 카드 뒤집기 게임의 경우 해당 탭 활성화 시 즉시 이니셜라이즈
+            if(tabId === 'tab-game2') {
+                initGame2();
+            }
+        }
+
+        function stopAllGames() {
+            // 게임 1 정리
+            isGameOver1 = true;
+            clearInterval(gameInterval1);
+            
+            // 게임 2 정리
+            clearInterval(timerInterval2);
+            
+            // 게임 3 정리
+            isGameOver3 = true;
+            clearInterval(spawnInterval3);
+            document.querySelectorAll('.falling-item').forEach(el => el.remove());
+        }
+
+        // --------------------------------------------------
+        // 1. [게임 1] 장애물 피하기 관련 로직
+        // --------------------------------------------------
+        const sprite1 = document.getElementById('character-sprite-1');
+        const obstacle1 = document.getElementById('obstacle-1');
+        const scoreBoard1 = document.getElementById('score-1');
+        const finalScore1 = document.getElementById('final-score-1');
+        const gameOverScreen1 = document.getElementById('game-over-1');
+        const charSelectScreen1 = document.getElementById('char-select-1');
+
+        let isJumping1 = false;
+        let score1 = 0;
+        let gameInterval1;
+        let isGameOver1 = false;
+        let obstacleSpeed1 = 6;
+
+        function jump1() {
+            if (isJumping1 || isGameOver1) return;
+            isJumping1 = true;
+            let position = 20;
+            
+            let upInterval = setInterval(() => {
+                if (position >= 170) {
+                    clearInterval(upInterval);
+                    let downInterval = setInterval(() => {
+                        if (position <= 20) {
+                            clearInterval(downInterval);
+                            isJumping1 = false;
+                        }
+                        position -= 6;
+                        sprite1.style.bottom = position + 'px';
+                    }, 12);
+                }
+                position += 8;
+                sprite1.style.bottom = position + 'px';
+            }, 12);
+        }
+
+        document.addEventListener('keydown', (e) => { 
+            if (e.code === 'Space' && document.getElementById('tab-game1').classList.contains('active')) { 
+                e.preventDefault(); 
+                jump1(); 
+            } 
+        });
+        document.getElementById('game-container-1').addEventListener('mousedown', jump1);
+        document.getElementById('game-container-1').addEventListener('touchstart', (e) => { 
+            if(e.cancelable) e.preventDefault(); 
+            jump1(); 
+        });
+
+        function startGame1(imgSrc) {
+            charSelectScreen1.style.display = 'none';
+            sprite1.src = imgSrc;
+            sprite1.style.display = 'block';
+            sprite1.style.bottom = '20px';
+            score1 = 0;
+            obstacleSpeed1 = 6;
+            isGameOver1 = false;
+            gameOverScreen1.style.display = 'none';
+            obstacle1.style.right = '-60px';
+            
+            clearInterval(gameInterval1);
+            gameInterval1 = setInterval(() => {
+                if(!isGameOver1) {
+                    score1++;
+                    scoreBoard1.innerText = score1;
+                    if (score1 % 10 === 0) obstacleSpeed1 += 0.5;
+                }
+            }, 100);
+
+            moveObstacle1();
+        }
+
+        function moveObstacle1() {
+            let obstaclePosition = -60;
+            function frame() {
+                if (isGameOver1) return;
+                obstaclePosition += obstacleSpeed1;
+                if (obstaclePosition > 860) obstaclePosition = -60;
+                obstacle1.style.right = obstaclePosition + 'px';
+
+                let obstacleLeft = 800 - obstaclePosition - 50;
+                let characterBottom = parseInt(window.getComputedStyle(sprite1).getPropertyValue('bottom'));
+
+                if (obstacleLeft > 50 && obstacleLeft < 110) {
+                    if (characterBottom < 80) { 
+                        endGame1();
+                        return;
+                    }
+                }
+                requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
+        }
+
+        function endGame1() {
+            isGameOver1 = true;
+            clearInterval(gameInterval1);
+            finalScore1.innerText = score1;
+            gameOverScreen1.style.display = 'flex';
+        }
+
+        function resetGame1() {
+            sprite1.style.display = 'none';
+            gameOverScreen1.style.display = 'none';
+            charSelectScreen1.style.display = 'flex';
+        }
+
+
+        // --------------------------------------------------
+        // 2. [게임 2] 카드 뒤집기 관련 로직
+        // --------------------------------------------------
+        const characterCards2 = [
+            { id: 'chichi', img: 'images/chichi.png', placeholder: '🐧' },
+            { id: 'daedae', img: 'images/daedae.png', placeholder: '🦢' },
+            { id: 'jaejae', img: 'images/jaejae.png', placeholder: '🌸' },
+            { id: 'panpan', img: 'images/panpan.png', placeholder: '🧸' },
+            { id: 'changchang', img: 'images/changchang.png', placeholder: '🦖' },
+            { id: 'symbol', img: 'images/symbol.png', placeholder: 'ㅅㅇ' }
+        ];
+
+        const gameDeck2 = [...characterCards2, ...characterCards2];
+        let flippedCards2 = [];
+        let matchedPairs2 = 0;
+        let timer2 = 0;
+        let timerInterval2;
+        let isLock2 = false;
+
+        const grid2 = document.getElementById('grid-2');
+        const timerText2 = document.getElementById('timer-2');
+        const matchesText2 = document.getElementById('matches-2');
+        const victoryScreen2 = document.getElementById('victory-screen-2');
+        const finalTimeText2 = document.getElementById('final-time-2');
+
+        function shuffle2(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initGame2() {
+            grid2.innerHTML = '';
+            flippedCards2 = [];
+            matchedPairs2 = 0;
+            timer2 = 0;
+            isLock2 = false;
+            
+            timerText2.innerText = timer2;
+            matchesText2.innerText = matchedPairs2;
+            victoryScreen2.style.display = 'none';
+
+            clearInterval(timerInterval2);
+            timerInterval2 = setInterval(() => {
+                timer2++;
+                timerText2.innerText = timer2;
+            }, 1000);
+
+            const shuffledDeck = shuffle2([...gameDeck2]);
+            shuffledDeck.forEach((cardData) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.id = cardData.id;
+
+                const frontFace = document.createElement('div');
+                frontFace.classList.add('card-face', 'card-front');
+                
+                const img = document.createElement('img');
+                img.src = cardData.img;
+                img.alt = cardData.id;
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    frontFace.innerText = cardData.placeholder;
+                };
+                frontFace.appendChild(img);
+
+                const backFace = document.createElement('div');
+                backFace.classList.add('card-face', 'card-back');
+                
+                const logoImg = document.createElement('img');
+                logoImg.src = 'images/logo_back.png'; 
+                logoImg.onerror = function() {
+                    this.style.display = 'none';
+                    backFace.innerText = 'ㅅㅇ';
+                };
+                backFace.appendChild(logoImg);
+
+                card.appendChild(frontFace);
+                card.appendChild(backFace);
+                
+                card.addEventListener('click', flipCard2);
+                grid2.appendChild(card);
+            });
+        }
+
+        function flipCard2() {
+            if (isLock2) return;
+            if (this.classList.contains('flipped') || this.classList.contains('matched')) return;
+
+            this.classList.add('flipped');
+            flippedCards2.push(this);
+
+            if (flippedCards2.length === 2) {
+                checkMatch2();
+            }
+        }
+
+        function checkMatch2() {
+            isLock2 = true;
+            const [card1, card2] = flippedCards2;
+
+            if (card1.dataset.id === card2.dataset.id) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs2++;
+                matchesText2.innerText = matchedPairs2;
+                flippedCards2 = [];
+                isLock2 = false;
+
+                if (matchedPairs2 === 6) {
+                    endGame2();
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards2 = [];
+                    isLock2 = false;
+                }, 800);
+            }
+        }
+
+        function endGame2() {
+            clearInterval(timerInterval2);
+            finalTimeText2.innerText = timer2;
+            setTimeout(() => {
+                victoryScreen2.style.display = 'flex';
+            }, 500);
+        }
+
+        function resetGame2() {
+            initGame2();
+        }
+
+
+        // --------------------------------------------------
+        // 3. [게임 3] 선물 받기 관련 로직
+        // --------------------------------------------------
+        const container3 = document.getElementById('game-container-3');
+        const basket3 = document.getElementById('basket-sprite-3');
+        const scoreText3 = document.getElementById('score-3');
+        const livesText3 = document.getElementById('lives-3');
+        const gameOverScreen3 = document.getElementById('game-over-3');
+        const charSelectScreen3 = document.getElementById('char-select-3');
+        const finalScoreText3 = document.getElementById('final-score-3');
+
+        let score3 = 0;
+        let lives3 = 3;
+        let isGameOver3 = false;
+        let spawnInterval3;
+        let activeItems3 = [];
+        let basketX3 = 215;
+        const containerWidth3 = 500;
+        const basketWidth3 = 70;
+
+        const itemsList3 = [
+            { id: 'item1', img: 'images/gift.png', score: 20, isBomb: false, fallback: '🎁' },
+            { id: 'item2', img: 'images/tissue.png', score: 10, isBomb: false, fallback: '🧻' },
+            { id: 'item3', img: 'images/fruit.png', score: 15, isBomb: false, fallback: '🍇' },
+            { id: 'bomb', img: 'images/dust.png', score: 0, isBomb: true, fallback: '💣' }
+        ];
+
+        document.addEventListener('keydown', (e) => {
+            if (isGameOver3 || !document.getElementById('tab-game3').classList.contains('active')) return;
+            if (e.key === 'ArrowLeft') {
+                basketX3 = Math.max(0, basketX3 - 25);
+                basket3.style.left = basketX3 + 'px';
+            } else if (e.key === 'ArrowRight') {
+                basketX3 = Math.min(containerWidth3 - basketWidth3, basketX3 + 25);
+                basket3.style.left = basketX3 + 'px';
+            }
+        });
+
+        let isDragging3 = false;
+        const dragStart3 = () => { if (!isGameOver3) isDragging3 = true; };
+        const dragMove3 = (e) => {
+            if (!isDragging3 || isGameOver3) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const rect = container3.getBoundingClientRect();
+            let newX = clientX - rect.left - (basketWidth3 / 2);
+            basketX3 = Math.max(0, Math.min(containerWidth3 - basketWidth3, newX));
+            basket3.style.left = basketX3 + 'px';
+        };
+        const dragEnd3 = () => { isDragging3 = false; };
+
+        basket3.addEventListener('mousedown', dragStart3);
+        document.addEventListener('mousemove', dragMove3);
+        document.addEventListener('mouseup', dragEnd3);
+        basket3.addEventListener('touchstart', dragStart3);
+        document.addEventListener('touchmove', dragMove3);
+        document.addEventListener('touchend', dragEnd3);
+
+        function startGame3(imgSrc) {
+            charSelectScreen3.style.display = 'none';
+            basket3.src = imgSrc;
+            basket3.style.left = '215px';
+            basketX3 = 215;
+            score3 = 0;
+            lives3 = 3;
+            isGameOver3 = false;
+            activeItems3 = [];
+            scoreText3.innerText = score3;
+            updateLivesUI3();
+            gameOverScreen3.style.display = 'none';
+
+            clearInterval(spawnInterval3);
+            spawnInterval3 = setInterval(spawnItem3, 950);
+            gameLoop3();
+        }
+
+        function spawnItem3() {
+            if (isGameOver3) return;
+
+            const config = itemsList3[Math.floor(Math.random() * itemsList3.length)];
+            const itemElement = document.createElement('img');
+            itemElement.classList.add('falling-item');
+            itemElement.src = config.img;
+            itemElement.alt = config.id;
+            
+            itemElement.onerror = function() {
+                const textFallback = document.createElement('div');
+                textFallback.classList.add('falling-item');
+                textFallback.innerText = config.fallback;
+                textFallback.style.left = itemElement.style.left;
+                textFallback.style.top = itemElement.style.top;
+                textFallback.style.fontSize = '35px';
+                
+                itemElement.replaceWith(textFallback);
+                const record = activeItems3.find(i => i.element === itemElement);
+                if (record) record.element = textFallback;
+            };
+
+            const randomX = Math.floor(Math.random() * (containerWidth3 - 45));
+            itemElement.style.left = randomX + 'px';
+            itemElement.style.top = '0px';
+            
+            container3.appendChild(itemElement);
+
+            activeItems3.push({
+                element: itemElement,
+                y: 0,
+                x: randomX,
+                config: config,
+                speed: 3 + Math.random() * 2.5
+            });
+        }
+
+        function gameLoop3() {
+            if (isGameOver3) return;
+
+            for (let i = activeItems3.length - 1; i >= 0; i--) {
+                const item = activeItems3[i];
+                item.y += item.speed;
+                item.element.style.top = item.y + 'px';
+
+                if (item.y >= 500 && item.y <= 550) {
+                    const itemCenterX = item.x + 22;
+                    if (itemCenterX >= basketX3 && itemCenterX <= basketX3 + basketWidth3) {
+                        if (item.config.isBomb) {
+                            lives3--;
+                            updateLivesUI3();
+                            if (lives3 <= 0) endGame3();
+                        } else {
+                            score3 += item.config.score;
+                            scoreText3.innerText = score3;
+                        }
+                        item.element.remove();
+                        activeItems3.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                if (item.y > 600) {
+                    item.element.remove();
+                    activeItems3.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(gameLoop3);
+        }
+
+        function updateLivesUI3() {
+            livesText3.innerText = '❤️'.repeat(lives3) + '🖤'.repeat(3 - lives3);
+        }
+
+        function endGame3() {
+            isGameOver3 = true;
+            clearInterval(spawnInterval3);
+            finalScoreText3.innerText = score3;
+            gameOverScreen3.style.display = 'flex';
+            activeItems3.forEach(item => item.element.remove());
+            activeItems3 = [];
+        }
+
+        function resetGame3() {
+            gameOverScreen3.style.display = 'none';
+            charSelectScreen3.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
