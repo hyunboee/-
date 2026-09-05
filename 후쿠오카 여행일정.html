@@ -319,6 +319,100 @@
             fill: #EA4335;
         }
 
+        /* 체크리스트 영역 스타일 */
+        .checklist-container {
+            background: #FDFBF7;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-top: 25px;
+        }
+
+        .checklist-title {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: var(--matcha);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .checklist-title span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .save-indicator {
+            font-size: 0.72em;
+            color: #888;
+            font-weight: normal;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            padding: 6px 0;
+            font-size: 0.86em;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 1px dashed #EDE6D8;
+        }
+
+        .check-item:last-child {
+            border-bottom: none;
+            padding-bottom: 2px;
+        }
+
+        .check-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 17px;
+            height: 17px;
+            border: 1.5px solid var(--matcha);
+            border-radius: 4px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: #FFF;
+        }
+
+        .check-item input[type="checkbox"]::before {
+            content: "";
+            width: 9px;
+            height: 9px;
+            transform: scale(0);
+            transition: 0.12s transform ease-in-out;
+            box-shadow: inset 1em 1em var(--vermilion);
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+
+        .check-item input[type="checkbox"]:checked {
+            border-color: var(--vermilion);
+        }
+
+        .check-item input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+
+        .check-item label {
+            cursor: pointer;
+            line-height: 1.45;
+            color: #333;
+            transition: color 0.2s ease;
+        }
+
+        .check-item input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            color: #9E9E9E;
+        }
+
         .tip-box {
             background: #F3F5EE;
             border-left: 4px solid var(--matcha);
@@ -391,7 +485,7 @@
     <!-- Day 1 콘텐츠 -->
     <div class="tab-view active">
         <div class="section-header">
-            <span class="section-header-title">♨️ Day 1 : 유후인 직행 & 비스피크·긴린코 산책</span>
+            <span class="section-header-title">♨️ Day 1 : 유후인 직행 & 비스피크·플로럴 빌리지·긴린코 산책</span>
         </div>
         <div class="schedule-list">
             <div class="schedule-item">
@@ -427,8 +521,8 @@
             <div class="schedule-item">
                 <span class="time-badge">15:20 - 18:00</span>
                 <div class="item-box">
-                    <h4>🍰 비스피크(B-speak) ➔ 유노츠보 군것질 ➔ 긴린코 호수</h4>
-                    <p>유노츠보 거리 입구의 명물 <span class="tag-highlight">'비스피크'</span>에서 폭신한 롤케이크를 픽업하고 출발! 금상 고로케, 벌꿀 아이스크림 등 먹거리와 함께 거리를 걸어 신비로운 물안개의 <span class="tag-highlight">'긴린코 호수'</span>까지 산책.</p>
+                    <h4>🍰 비스피크 ➔ 유노츠보 군것질 ➔ 🏰 플로럴 빌리지 ➔ 긴린코 호수</h4>
+                    <p>유노츠보 거리 입구의 <span class="tag-highlight">'비스피크'</span>에서 롤케이크를 픽업하고 출발! 금상 고로케, 벌꿀 아이스크림을 먹으며 아기자기한 동화마을 <span class="tag-highlight">'플로럴 빌리지'</span>에서 커플 사진 촬영 후, 신비로운 물안개의 <span class="tag-highlight">'긴린코 호수'</span>까지 산책.</p>
                     <div class="map-btn-group">
                         <a href="https://maps.google.com/?q=B-speak+Yufuin" target="_blank" class="map-btn">
                             <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -437,6 +531,10 @@
                         <a href="https://maps.google.com/?q=Yunotsubo+Street+Yufuin" target="_blank" class="map-btn">
                             <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                             유노츠보 거리
+                        </a>
+                        <a href="https://maps.google.com/?q=Yufuin+Floral+Village" target="_blank" class="map-btn">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            플로럴 빌리지
                         </a>
                         <a href="https://maps.google.com/?q=Lake+Kinrin+Yufuin" target="_blank" class="map-btn">
                             <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -449,7 +547,7 @@
                 <span class="time-badge">18:30 - 21:00</span>
                 <div class="item-box">
                     <h4>호타루 료칸 온천욕 & 저녁 식사</h4>
-                    <p>료칸으로 복귀해 둘만의 프라이빗 노천탕에서 여독을 풀고 롤케이크 디저트와 저녁 즐기기.</p>
+                    <p>료칸으로 복귀해 둘만의 프라이빗 노천탕에서 여독을 풀고 롤케이크 디저트와 저녁 즐기기. 온천 후 달콤한 아이스크림 타임!</p>
                     <div class="map-btn-group">
                         <a href="https://maps.google.com/?q=Yadoya+Hotaru+Yufuin" target="_blank" class="map-btn">
                             <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -459,12 +557,52 @@
                 </div>
             </div>
         </div>
+
+        <!-- Day 1 체크리스트 -->
+        <div class="checklist-container">
+            <div class="checklist-title">
+                <span>♨️ 유후인 필수 먹거리 & 힐링 버킷리스트</span>
+                <span class="save-indicator">자동저장 됨</span>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d1_check1">
+                <label for="d1_check1">온천욕 후 시원한 <strong>유리병 우유 / 커피우유</strong> 자판기에서 뽑아 마시기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d1_check2">
+                <label for="d1_check2">온천욕 마친 후 차가운 <strong>피노(Pino) or 유키미다이후쿠(찰떡아이스)</strong> 먹기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d1_check3">
+                <label for="d1_check3">얼음물에 담긴 구슬 톡! <strong>온천 라무네 사이다</strong> 마시기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d1_check4">
+                <label for="d1_check4"><strong>비스피크(B-speak)</strong> 폭신한 플레인 롤케이크 맛보기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d1_check5">
+                <label for="d1_check5">동화마을 <strong>플로럴 빌리지</strong>에서 인생 커플샷 남기기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d1_check6">
+                <label for="d1_check6">겉바속촉 <strong>금상 고로케</strong> (오리지널 or 치즈)</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d1_check7">
+                <label for="d1_check7"><strong>미르히(Milch)</strong> 부드러운 푸딩 & 컵 치즈케이크</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d1_check8">
+                <label for="d1_check8"><strong>허니비(Bee Honey)</strong> 달콤한 벌꿀 소프트아이스크림</label>
+            </div>
+        </div>
     </div>
 
     <!-- Day 2 콘텐츠 -->
     <div class="tab-view">
         <div class="section-header">
-            <span class="section-header-title">🏮 Day 2 : 모모치 해변 & 도심 캐널시티·이자카야</span>
+            <span class="section-header-title">🏮 Day 2 : 모모치 해변 & 캐널시티·이자카야</span>
         </div>
         <div class="schedule-list">
             <div class="schedule-item">
@@ -521,12 +659,12 @@
             <div class="schedule-item">
                 <span class="time-badge">17:00 - 18:45</span>
                 <div class="item-box">
-                    <h4>캐널시티 하카타 음악 분수쇼 & 나카스 강변 노을</h4>
-                    <p>도심으로 복귀해 캐널시티 운하에서 화려한 <span class="tag-highlight">음악 분수쇼</span>를 감상하고 노을 지는 강변을 따라 낭만 산책.</p>
+                    <h4>🛍️ 캐널시티 하카타: 음악 분수쇼 & 지하 1층 몬치치(Monchhichi)</h4>
+                    <p>도심으로 복귀해 캐널시티 운하에서 화려한 <span class="tag-highlight">음악 분수쇼</span>를 감상하고, <span class="tag-highlight">지하 1층(B1F) 캐릭터 숍</span>에 들러 귀여운 <strong>몬치치 인형</strong> 쇼핑하기! 석양빛 도는 나카스 강변을 따라 이자카야로 산책.</p>
                     <div class="map-btn-group">
                         <a href="https://maps.google.com/?q=Canal+City+Hakata" target="_blank" class="map-btn">
                             <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            캐널시티 하카타
+                            캐널시티 하카타 (B1F 캐릭터존)
                         </a>
                         <a href="https://maps.google.com/?q=Nakasu+River+Cruise+Fukuoka" target="_blank" class="map-btn">
                             <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -560,6 +698,34 @@
                         </a>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Day 2 체크리스트 -->
+        <div class="checklist-container">
+            <div class="checklist-title">
+                <span>🏮 도심 핫플 & 쇼핑 체크리스트</span>
+                <span class="save-indicator">자동저장 됨</span>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d2_check1">
+                <label for="d2_check1">캐널시티 B1F에서 귀여운 <strong>몬치치(Monchhichi) 인형</strong> 득템하기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d2_check2">
+                <label for="d2_check2">이자카야에서 <strong>토리카와(닭껍질 꼬치) & 시원한 생맥주</strong> 한잔</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d2_check3">
+                <label for="d2_check3">편의점에서 <strong>오하요 쟈지푸딩(저지우유 푸딩)</strong> 사먹기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d2_check4">
+                <label for="d2_check4">돈키호테 나카스 본점에서 <strong>산토리 가쿠빈 위스키 & 면세 쇼핑</strong></label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d2_check5">
+                <label for="d2_check5">밤 숙소 야식으로 <strong>로손 모찌롤 & 타마고 샌드위치</strong> 즐기기</label>
             </div>
         </div>
     </div>
@@ -642,14 +808,39 @@
                 </div>
             </div>
         </div>
+
+        <!-- Day 3 체크리스트 -->
+        <div class="checklist-container">
+            <div class="checklist-title">
+                <span>✈️ 출국 전 마지막 먹거리 & 기념품</span>
+                <span class="save-indicator">자동저장 됨</span>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d3_check1">
+                <label for="d3_check1">하카타역 <strong>일포르노델미뇽 갓 구운 미니 크로와상</strong> 맛보기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d3_check2">
+                <label for="d3_check2">바삭하고 짭조름한 <strong>멘타이코(명란) 바게트</strong> 먹기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d3_check3">
+                <label for="d3_check3">면세점에서 <strong>로이스 생초콜릿 & 도쿄바나나</strong> 기념품 챙기기</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="d3_check4">
+                <label for="d3_check4">공항 가기 전 <strong>위탁 수하물 15kg</strong> 무게 확인하기</label>
+            </div>
+        </div>
     </div>
 
     <div class="tip-box">
         <div class="tip-box-title">🏮 여행 전 필수 확인 메모</div>
         <ul>
-            <li><strong>비스피크 롤케이크:</strong> 인기 상품(특히 스몰 사이즈)은 오후 일찍 품절될 수 있으니 도착 직후 구매 추천!</li>
-            <li><strong>모모치 해변 이동:</strong> 하카타역 버스 정류장에서 306번 등 직행버스를 타면 약 25분 만에 도착합니다.</li>
-            <li><strong>구글맵 연동:</strong> 각 일정 아래 파란색 핀 버튼을 누르면 구글 지도 길찾기가 바로 시작됩니다.</li>
+            <li><strong>체크리스트 저장:</strong> 체크박스를 터치하면 취소선이 그어지며, 브라우저를 껐다 켜도 체크 상태가 유지(LocalStorage)됩니다.</li>
+            <li><strong>플로럴 빌리지:</strong> 긴린코 호수로 넘어가는 길목에 위치하며, 아기자기한 동물들과 동화마을 포토존이 가득합니다.</li>
+            <li><strong>캐널시티 몬치치:</strong> B1F 캐릭터 매장 구역에서 쉽게 찾으실 수 있습니다.</li>
+            <li><strong>비스피크 롤케이크:</strong> 인기 사이즈(스몰)는 조기 품절될 수 있으니 도착하자마자 들르시는 것을 권장합니다.</li>
         </ul>
     </div>
 
@@ -679,6 +870,18 @@
             }
         });
     }
+
+    const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
+    
+    checkboxes.forEach(cb => {
+        const saved = localStorage.getItem('fukuoka_cb_' + cb.id);
+        if (saved === 'true') {
+            cb.checked = true;
+        }
+        cb.addEventListener('change', () => {
+            localStorage.setItem('fukuoka_cb_' + cb.id, cb.checked);
+        });
+    });
 </script>
 
 </body>
