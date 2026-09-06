@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>福岡 恋旅 - 후쿠오카 2박 3일 감성 일정</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Noto+Serif+KR:wght@300;400;600;700&display=swap');
 
         :root {
             --bg-washi: #FAF7F0;
-            --card-bg: rgba(255, 255, 255, 0.96);
+            --card-bg: rgba(255, 255, 255, 0.98);
             --ink-black: #1E1E1E;
             --vermilion: #B83B32;
             --indigo: #1C2D42;
             --matcha: #4A5B40;
             --gold: #C5A059;
             --border-color: #E6DFD3;
-            --soft-shadow: 0 10px 30px rgba(70, 50, 40, 0.07);
+            --soft-shadow: 0 8px 24px rgba(70, 50, 40, 0.08);
         }
 
         * {
@@ -29,7 +31,7 @@
             background-color: var(--bg-washi);
             color: var(--ink-black);
             margin: 0;
-            padding: 18px 12px;
+            padding: 0;
             background-image: 
                 radial-gradient(#DCD3C1 0.8px, transparent 0.8px),
                 linear-gradient(to right, rgba(230, 223, 211, 0.25) 1px, transparent 1px);
@@ -38,9 +40,83 @@
             letter-spacing: -0.2px;
         }
 
-        .paper-frame {
+        /* 고정 지도 래퍼 (상단 고정 Sticky) */
+        .sticky-map-wrapper {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #FFF;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+            border-bottom: 2px solid var(--gold);
+            transition: all 0.3s ease;
+        }
+
+        #travel-map-container {
+            width: 100%;
+            height: 220px;
+            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        #travel-map-container.collapsed {
+            height: 0px !important;
+        }
+
+        #travel-map {
+            width: 100%;
+            height: 220px;
+            background: #EFEFEF;
+        }
+
+        .map-location-badge {
+            background: var(--indigo);
+            color: #FFF;
+            font-size: 0.82em;
+            padding: 7px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .map-location-badge .loc-name {
+            font-weight: 600;
+            color: #FFE699;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 65%;
+        }
+
+        .map-toggle-btn {
+            background: rgba(255, 255, 255, 0.18);
+            color: #FFF;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 12px;
+            padding: 3px 9px;
+            font-size: 0.85em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+            font-family: 'Noto Serif KR', serif;
+        }
+
+        .map-toggle-btn:active {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .main-container {
             max-width: 520px;
             margin: 0 auto;
+            padding: 18px 12px 60px 12px;
+        }
+
+        .paper-frame {
             background: var(--card-bg);
             border-radius: 12px;
             padding: 24px 18px;
@@ -76,7 +152,7 @@
         .header-area {
             text-align: center;
             margin-top: 4px;
-            margin-bottom: 22px;
+            margin-bottom: 20px;
         }
 
         .kanji-title {
@@ -90,7 +166,7 @@
         }
 
         .main-title {
-            font-size: 1.08em;
+            font-size: 1.05em;
             font-weight: 600;
             color: var(--indigo);
             margin-top: 4px;
@@ -110,23 +186,22 @@
             background: #FDFCF7;
             border: 1px dashed var(--gold);
             border-radius: 8px;
-            padding: 14px 16px;
-            margin-bottom: 22px;
-            position: relative;
+            padding: 12px 14px;
+            margin-bottom: 20px;
         }
 
         .flight-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85em;
-            padding: 4px 0;
+            font-size: 0.83em;
+            padding: 3px 0;
         }
 
         .flight-row:not(:last-child) {
             border-bottom: 1px dotted #EFE8DC;
-            margin-bottom: 4px;
-            padding-bottom: 6px;
+            margin-bottom: 3px;
+            padding-bottom: 5px;
         }
 
         .flight-tag {
@@ -164,7 +239,7 @@
             color: #767064;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             line-height: 1.35;
         }
 
@@ -185,16 +260,10 @@
 
         .tab-view {
             display: none;
-            animation: fadeIn 0.35s ease-out;
         }
 
         .tab-view.active {
             display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .section-header {
@@ -230,7 +299,13 @@
 
         .schedule-item {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            transition: transform 0.25s ease;
+            cursor: pointer;
+        }
+
+        .schedule-item.active-scroll {
+            transform: translateX(4px);
         }
 
         .schedule-item::before {
@@ -243,6 +318,13 @@
             border-radius: 50%;
             background: var(--card-bg);
             border: 2px solid var(--vermilion);
+            transition: all 0.3s ease;
+        }
+
+        .schedule-item.active-scroll::before {
+            background: var(--vermilion);
+            transform: scale(1.4);
+            box-shadow: 0 0 8px rgba(184, 59, 50, 0.7);
         }
 
         .time-badge {
@@ -260,6 +342,17 @@
             border-radius: 6px;
             padding: 12px 14px;
             margin-top: 3px;
+            transition: all 0.25s ease;
+        }
+
+        .schedule-item:hover .item-box {
+            border-color: #D8C3A5;
+        }
+
+        .schedule-item.active-scroll .item-box {
+            border-color: var(--vermilion);
+            background: #FFFDFB;
+            box-shadow: 0 4px 14px rgba(184, 59, 50, 0.12);
         }
 
         .item-box h4 {
@@ -310,7 +403,6 @@
             background: #E8F0FE;
             color: #174EA6;
             border-color: #AECBFA;
-            transform: translateY(-1px);
         }
 
         .map-btn svg {
@@ -448,431 +540,656 @@
             font-size: 0.78em;
             letter-spacing: 2px;
         }
+
+        /* 깃발/라벨형 지도 마커 툴팁 */
+        .leaflet-tooltip-pane .map-label-tooltip {
+            background-color: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--vermilion);
+            color: var(--indigo);
+            font-weight: 700;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            white-space: nowrap;
+            letter-spacing: -0.2px;
+            font-family: 'Noto Serif KR', serif;
+        }
+
+        .leaflet-tooltip-pane .map-label-tooltip.active {
+            background-color: var(--vermilion);
+            border-color: #FFF;
+            color: #FFFFFF;
+            box-shadow: 0 3px 8px rgba(184, 59, 50, 0.45);
+        }
+
+        .leaflet-tooltip-bottom:before {
+            border-bottom-color: var(--vermilion) !important;
+        }
     </style>
 </head>
 <body>
 
-<div class="paper-frame">
-    <div class="header-area">
-        <div class="stamp-mark">福岡・由布院</div>
-        <h1 class="kanji-title">福岡戀旅</h1>
-        <div class="main-title">후쿠오카 & 유후인 2박 3일 낭만 여행</div>
-        <div class="date-badge">
-            <span>2026.09.18(金)</span> ➔ <span>2026.09.20(日)</span>
-        </div>
+<!-- 상단 고정 지도 네비게이션 헤더 -->
+<div class="sticky-map-wrapper">
+    <div id="travel-map-container">
+        <div id="travel-map"></div>
     </div>
-
-    <div class="flight-boarding-pass">
-        <div class="flight-row">
-            <div><span class="flight-tag">가는 편</span><strong>인천 T2 ➔ 후쿠오카 T1</strong></div>
-            <div class="flight-time">09:40 - 11:10 (LJ0273)</div>
-        </div>
-        <div class="flight-row">
-            <div><span class="flight-tag" style="background:var(--indigo);">오는 편</span><strong>후쿠오카 T1 ➔ 인천 T2</strong></div>
-            <div class="flight-time">19:40 - 21:00 (LJ0272)</div>
-        </div>
-        <div class="flight-row" style="font-size: 0.78em; color: #666; justify-content: flex-end;">
-            <span>위탁 수하물 1인당 15kg 무료</span>
-        </div>
-    </div>
-
-    <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab(0)">Day 1<small>유후인 료칸 & 디저트</small></button>
-        <button class="tab-btn" onclick="switchTab(1)">Day 2<small>모모치 & 텐진·하카타</small></button>
-        <button class="tab-btn" onclick="switchTab(2)">Day 3<small>도심의 여운</small></button>
-    </div>
-
-    <!-- Day 1 콘텐츠 -->
-    <div class="tab-view active">
-        <div class="section-header">
-            <span class="section-header-title">♨️ Day 1 : 유후인 직행 & 비스피크·플로럴 빌리지·긴린코 산책</span>
-        </div>
-        <div class="schedule-list">
-            <div class="schedule-item">
-                <span class="time-badge">11:10 - 12:20</span>
-                <div class="item-box">
-                    <h4>후쿠오카 공항 도착 & 고속버스 탑승</h4>
-                    <p>공항 국제선 입국장 앞 버스 승강장에서 <span class="tag-highlight">'유후인행 고속버스'</span> 직행 탑승.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Fukuoka+Airport+International+Terminal+Bus+Stop" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            공항 버스 정류장
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">14:20 - 15:00</span>
-                <div class="item-box">
-                    <h4>유후인역 도착 ➔ 택시로 '야도야 호타루' 이동</h4>
-                    <p>유후인역 앞 버스센터 하차 후 택시로 료칸 <span class="tag-highlight">'야도야 호타루(宿屋 螢)'</span> 이동 및 짐 풀기.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Yufuin+Station+Bus+Center" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            유후인역 앞 버스센터
-                        </a>
-                        <a href="https://maps.google.com/?q=Yadoya+Hotaru+Yufuin" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            숙소: 야도야 호타루
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">15:20 - 18:00</span>
-                <div class="item-box">
-                    <h4>🍰 비스피크 ➔ 유노츠보 군것질 ➔ 🏰 플로럴 빌리지 ➔ 긴린코 호수</h4>
-                    <p>유노츠보 거리 입구의 <span class="tag-highlight">'비스피크'</span>에서 롤케이크를 픽업하고 출발! 금상 고로케, 벌꿀 아이스크림을 먹으며 아기자기한 동화마을 <span class="tag-highlight">'플로럴 빌리지'</span>에서 커플 사진 촬영 후, 신비로운 물안개의 <span class="tag-highlight">'긴린코 호수'</span>까지 산책.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=B-speak+Yufuin" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            비스피크 (B-speak)
-                        </a>
-                        <a href="https://maps.google.com/?q=Yunotsubo+Street+Yufuin" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            유노츠보 거리
-                        </a>
-                        <a href="https://maps.google.com/?q=Yufuin+Floral+Village" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            플로럴 빌리지
-                        </a>
-                        <a href="https://maps.google.com/?q=Lake+Kinrin+Yufuin" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            긴린코 호수
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">18:30 - 21:00</span>
-                <div class="item-box">
-                    <h4>호타루 료칸 온천욕 & 저녁 식사</h4>
-                    <p>료칸으로 복귀해 둘만의 프라이빗 노천탕에서 여독을 풀고 롤케이크 디저트와 저녁 즐기기. 온천 후 달콤한 아이스크림 타임!</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Yadoya+Hotaru+Yufuin" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            야도야 호타루 료칸
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Day 1 체크리스트 -->
-        <div class="checklist-container">
-            <div class="checklist-title">
-                <span>♨️ 유후인 필수 먹거리 & 힐링 버킷리스트</span>
-                <span class="save-indicator">자동저장 됨</span>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d1_check1">
-                <label for="d1_check1">온천욕 후 시원한 <strong>유리병 우유 / 커피우유</strong> 자판기에서 뽑아 마시기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d1_check2">
-                <label for="d1_check2">온천욕 마친 후 차가운 <strong>피노(Pino) or 유키미다이후쿠(찰떡아이스)</strong> 먹기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d1_check3">
-                <label for="d1_check3">얼음물에 담긴 구슬 톡! <strong>온천 라무네 사이다</strong> 마시기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d1_check4">
-                <label for="d1_check4"><strong>비스피크(B-speak)</strong> 폭신한 플레인 롤케이크 맛보기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d1_check5">
-                <label for="d1_check5">동화마을 <strong>플로럴 빌리지</strong>에서 인생 커플샷 남기기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d1_check6">
-                <label for="d1_check6">겉바속촉 <strong>금상 고로케</strong> (오리지널 or 치즈)</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d1_check7">
-                <label for="d1_check7"><strong>미르히(Milch)</strong> 부드러운 푸딩 & 컵 치즈케이크</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d1_check8">
-                <label for="d1_check8"><strong>허니비(Bee Honey)</strong> 달콤한 벌꿀 소프트아이스크림</label>
-            </div>
-        </div>
-    </div>
-
-    <!-- Day 2 콘텐츠 -->
-    <div class="tab-view">
-        <div class="section-header">
-            <span class="section-header-title">🏮 Day 2 : 모모치 해변 & 캐널시티·이자카야</span>
-        </div>
-        <div class="schedule-list">
-            <div class="schedule-item">
-                <span class="time-badge">09:30 - 12:00</span>
-                <div class="item-box">
-                    <h4>유후인 출발 ➔ 하카타 존크 호텔 체크인</h4>
-                    <p>고속버스로 하카타역 도착 후 둘째 날 숙소인 <span class="tag-highlight">'존크 호텔 하카타'</span>에 짐 보관.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Hakata+Bus+Terminal" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            하카타 버스터미널
-                        </a>
-                        <a href="https://maps.google.com/?q=ZONK+HOTEL+HAKATA" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            숙소: 존크 호텔 하카타
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">12:30 - 13:45</span>
-                <div class="item-box">
-                    <h4>하카타 돈코츠 라멘 점심</h4>
-                    <p>하카타역 바로 옆 <span class="tag-highlight">'신신라멘'</span> 또는 <span class="tag-highlight">'이치란'</span>에서 든든한 라멘 식사.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Hakata+Shin-Shin+KITTE+Hakata" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            신신라멘 KITTE하카타
-                        </a>
-                        <a href="https://maps.google.com/?q=Ichiran+Hakata+Sunplaza+Underground" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            이치란 하카타역점
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">14:15 - 16:30</span>
-                <div class="item-box">
-                    <h4>🌊 모모치 해변공원 & 후쿠오카 타워</h4>
-                    <p>이국적인 분위기의 <span class="tag-highlight">모모치 해변(마리존)</span>과 <span class="tag-highlight">후쿠오카 타워</span>에서 시원한 바닷바람과 함께 커플 사진 촬영!</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Momochi+Seaside+Park" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            모모치 해변공원
-                        </a>
-                        <a href="https://maps.google.com/?q=Fukuoka+Tower" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            후쿠오카 타워
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">17:00 - 18:45</span>
-                <div class="item-box">
-                    <h4>🛍️ 캐널시티 하카타: 음악 분수쇼 & 지하 1층 몬치치(Monchhichi)</h4>
-                    <p>도심으로 복귀해 캐널시티 운하에서 화려한 <span class="tag-highlight">음악 분수쇼</span>를 감상하고, <span class="tag-highlight">지하 1층(B1F) 캐릭터 숍</span>에 들러 귀여운 <strong>몬치치 인형</strong> 쇼핑하기! 석양빛 도는 나카스 강변을 따라 이자카야로 산책.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Canal+City+Hakata" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            캐널시티 하카타 (B1F 캐릭터존)
-                        </a>
-                        <a href="https://maps.google.com/?q=Nakasu+River+Cruise+Fukuoka" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            나카스 강변 산책로
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">19:15 - 21:15</span>
-                <div class="item-box">
-                    <h4>로컬 감성 이자카야 (야키토리 & 나베)</h4>
-                    <p>나카스/텐진의 분위기 좋은 이자카야(<span class="tag-highlight">토리카와 스이쿄우</span> 등)에서 겉바속촉 닭껍질 꼬치와 생맥주 & 하이볼!</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Torikawa+Suikyou+Fukuoka" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            토리카와 스이쿄우
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">21:30 - 23:30</span>
-                <div class="item-box">
-                    <h4>돈키호테 나카스 본점 심야 쇼핑</h4>
-                    <p>이자카야 바로 옆 24시간 나카스 본점에서 면세 쇼핑(산토리 위스키, 화장품, 일본 간식 득템) 후 존크 호텔 복귀.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Don+Quijote+Nakasu+Fukuoka" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            돈키호테 나카스점 (본점)
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Day 2 체크리스트 -->
-        <div class="checklist-container">
-            <div class="checklist-title">
-                <span>🏮 도심 핫플 & 쇼핑 체크리스트</span>
-                <span class="save-indicator">자동저장 됨</span>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d2_check1">
-                <label for="d2_check1">캐널시티 B1F에서 귀여운 <strong>몬치치(Monchhichi) 인형</strong> 득템하기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d2_check2">
-                <label for="d2_check2">이자카야에서 <strong>토리카와(닭껍질 꼬치) & 시원한 생맥주</strong> 한잔</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d2_check3">
-                <label for="d2_check3">편의점에서 <strong>오하요 쟈지푸딩(저지우유 푸딩)</strong> 사먹기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d2_check4">
-                <label for="d2_check4">돈키호테 나카스 본점에서 <strong>산토리 가쿠빈 위스키 & 면세 쇼핑</strong></label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d2_check5">
-                <label for="d2_check5">밤 숙소 야식으로 <strong>로손 모찌롤 & 타마고 샌드위치</strong> 즐기기</label>
-            </div>
-        </div>
-    </div>
-
-    <!-- Day 3 콘텐츠 -->
-    <div class="tab-view">
-        <div class="section-header">
-            <span class="section-header-title">🌸 Day 3 : 정갈한 정원 & 아쉬운 작별</span>
-        </div>
-        <div class="schedule-list">
-            <div class="schedule-item">
-                <span class="time-badge">10:30 - 12:30</span>
-                <div class="item-box">
-                    <h4>오호리 공원 & 일본 정원(日本庭園)</h4>
-                    <p>호숫가를 여유롭게 거닐다 푸른 이끼와 연못, 다실이 어우러진 정갈한 일본 정원에서 감성 가득 커플 사진.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Ohori+Park+Japanese+Garden" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            오호리 공원 일본 정원
-                        </a>
-                        <a href="https://maps.google.com/?q=Starbucks+Coffee+Fukuoka+Ohori+Park" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            스타벅스 오호리공원점
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">13:00 - 14:30</span>
-                <div class="item-box">
-                    <h4>마지막 특별 점심</h4>
-                    <p>지글지글 철판 곱창구이 <span class="tag-highlight">'텐진호르몬'</span> 또는 따끈하고 진한 <span class="tag-highlight">'모츠나베'</span>로 풍성한 식사.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Tenjin+Horumon+Hakata+Station" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            텐진호르몬 (하카타역점)
-                        </a>
-                        <a href="https://maps.google.com/?q=Hakata+Motsunabe+Oyama+KITTE+Hakata" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            모츠나베 오오야마
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">15:00 - 17:00</span>
-                <div class="item-box">
-                    <h4>다이묘 거리 & 백화점 쇼핑</h4>
-                    <p>다이묘 거리 편집숍 탐방 및 이와타야 백화점 둘러보기 후 편의점 간식 쇼핑.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Daimyo+Chuo-ku+Fukuoka" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            다이묘 거리
-                        </a>
-                        <a href="https://maps.google.com/?q=Iwataya+Main+Store+Fukuoka" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            이와타야 백화점
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">17:30 - 19:40</span>
-                <div class="item-box">
-                    <h4>후쿠오카 공항 이동 & 출국 수속</h4>
-                    <p>지하철로 공항 이동 후 면세점 쇼핑. 19:40 비행기 탑승.</p>
-                    <div class="map-btn-group">
-                        <a href="https://maps.google.com/?q=Fukuoka+Airport+International+Terminal" target="_blank" class="map-btn">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            후쿠오카 공항
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="schedule-item">
-                <span class="time-badge">21:00</span>
-                <div class="item-box">
-                    <h4>인천공항 제2터미널 도착</h4>
-                    <p>소중하고 낭만적이었던 2박 3일 후쿠오카 여행 마무리!</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Day 3 체크리스트 -->
-        <div class="checklist-container">
-            <div class="checklist-title">
-                <span>✈️ 출국 전 마지막 먹거리 & 기념품</span>
-                <span class="save-indicator">자동저장 됨</span>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d3_check1">
-                <label for="d3_check1">하카타역 <strong>일포르노델미뇽 갓 구운 미니 크로와상</strong> 맛보기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d3_check2">
-                <label for="d3_check2">바삭하고 짭조름한 <strong>멘타이코(명란) 바게트</strong> 먹기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d3_check3">
-                <label for="d3_check3">면세점에서 <strong>로이스 생초콜릿 & 도쿄바나나</strong> 기념품 챙기기</label>
-            </div>
-            <div class="check-item">
-                <input type="checkbox" id="d3_check4">
-                <label for="d3_check4">공항 가기 전 <strong>위탁 수하물 15kg</strong> 무게 확인하기</label>
-            </div>
-        </div>
-    </div>
-
-    <div class="tip-box">
-        <div class="tip-box-title">🏮 여행 전 필수 확인 메모</div>
-        <ul>
-            <li><strong>체크리스트 저장:</strong> 체크박스를 터치하면 취소선이 그어지며, 브라우저를 껐다 켜도 체크 상태가 유지(LocalStorage)됩니다.</li>
-            <li><strong>플로럴 빌리지:</strong> 긴린코 호수로 넘어가는 길목에 위치하며, 아기자기한 동물들과 동화마을 포토존이 가득합니다.</li>
-            <li><strong>캐널시티 몬치치:</strong> B1F 캐릭터 매장 구역에서 쉽게 찾으실 수 있습니다.</li>
-            <li><strong>비스피크 롤케이크:</strong> 인기 사이즈(스몰)는 조기 품절될 수 있으니 도착하자마자 들르시는 것을 권장합니다.</li>
-        </ul>
-    </div>
-
-    <div class="footer-kanji">
-        一期一会 ・ 福岡の思い出
+    <div class="map-location-badge">
+        <span class="loc-name" id="current-location-text">📍 위치 로딩 중...</span>
+        <button class="map-toggle-btn" onclick="toggleMap()" id="map-toggle-btn">
+            <span>지도 접기</span> <span id="toggle-icon">▲</span>
+        </button>
     </div>
 </div>
 
+<div class="main-container">
+    <div class="paper-frame">
+        <div class="header-area">
+            <div class="stamp-mark">福岡・由布院</div>
+            <h1 class="kanji-title">福岡戀旅</h1>
+            <div class="main-title">후쿠오카 & 유후인 2박 3일 낭만 여행</div>
+            <div class="date-badge">
+                <span>2026.09.18(金)</span> ➔ <span>2026.09.20(日)</span>
+            </div>
+        </div>
+
+        <div class="flight-boarding-pass">
+            <div class="flight-row">
+                <div><span class="flight-tag">가는 편</span><strong>인천 T2 ➔ 후쿠오카 T1</strong></div>
+                <div class="flight-time">09:40 - 11:10 (LJ0273)</div>
+            </div>
+            <div class="flight-row">
+                <div><span class="flight-tag" style="background:var(--indigo);">오는 편</span><strong>후쿠오카 T1 ➔ 인천 T2</strong></div>
+                <div class="flight-time">19:40 - 21:00 (LJ0272)</div>
+            </div>
+            <div class="flight-row" style="font-size: 0.78em; color: #666; justify-content: flex-end;">
+                <span>위탁 수하물 1인당 15kg 무료</span>
+            </div>
+        </div>
+
+        <!-- 탭 버튼 -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab(0)">Day 1<small>유후인 료칸 & 디저트</small></button>
+            <button class="tab-btn" onclick="switchTab(1)">Day 2<small>모모치 & 텐진·하카타</small></button>
+            <button class="tab-btn" onclick="switchTab(2)">Day 3<small>도심의 여운</small></button>
+        </div>
+
+        <!-- Day 1 콘텐츠 -->
+        <div class="tab-view active">
+            <div class="section-header">
+                <span class="section-header-title">♨️ Day 1 : 유후인 직행 & 비스피크·플로럴 빌리지·긴린코</span>
+            </div>
+            <div class="schedule-list">
+                <!-- 1. 공항 도착 -->
+                <div class="schedule-item" data-lat="33.5859" data-lng="130.4507" data-name="후쿠오카 공항 국제선">
+                    <span class="time-badge">11:10 - 12:20</span>
+                    <div class="item-box">
+                        <h4>후쿠오카 공항 도착 & 고속버스 탑승</h4>
+                        <p>공항 국제선(T1) 입국장 앞 버스 승강장에서 <span class="tag-highlight">'유후인행 고속버스'</span> 직행 탑승.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Fukuoka+Airport+International+Terminal+Bus+Stop" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                공항 버스 정류장
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 유후인역 & 호타루 료칸 -->
+                <div class="schedule-item" data-lat="33.2538" data-lng="131.3425" data-name="숙소: 야도야 호타루 료칸">
+                    <span class="time-badge">14:20 - 15:00</span>
+                    <div class="item-box">
+                        <h4>유후인역 도착 ➔ 택시로 '야도야 호타루' 이동</h4>
+                        <p>유후인역 앞 버스센터 하차 후 택시로 감성 료칸 <span class="tag-highlight">'야도야 호타루(宿屋 螢)'</span> 이동 및 짐 풀기.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Yufuin+Station+Bus+Center" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                유후인역 버스센터
+                            </a>
+                            <a href="https://maps.google.com/?q=Yadoya+Hotaru+Yufuin" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                숙소: 야도야 호타루
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 비스피크 & 플로럴 빌리지 & 긴린코 -->
+                <div class="schedule-item" data-lat="33.2661" data-lng="131.3678" data-name="비스피크 & 플로럴 빌리지">
+                    <span class="time-badge">15:20 - 18:00</span>
+                    <div class="item-box">
+                        <h4>🍰 비스피크 ➔ 유노츠보 군것질 ➔ 🏰 플로럴 빌리지 ➔ 긴린코 호수</h4>
+                        <p>유노츠보 거리 입구의 <span class="tag-highlight">'비스피크'</span>에서 롤케이크를 픽업하고 출발! 금상 고로케, 벌꿀 아이스크림을 먹으며 동화마을 <span class="tag-highlight">'플로럴 빌리지'</span>에서 커플 사진 촬영 후, 신비로운 물안개의 <span class="tag-highlight">'긴린코 호수'</span>까지 산책.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=B-speak+Yufuin" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                비스피크 (B-speak)
+                            </a>
+                            <a href="https://maps.google.com/?q=Yufuin+Floral+Village" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                플로럴 빌리지
+                            </a>
+                            <a href="https://maps.google.com/?q=Lake+Kinrin+Yufuin" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                긴린코 호수
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. 온천 & 야식 -->
+                <div class="schedule-item" data-lat="33.2538" data-lng="131.3425" data-name="야도야 호타루 료칸 (온천욕)">
+                    <span class="time-badge">18:30 - 21:00</span>
+                    <div class="item-box">
+                        <h4>호타루 료칸 온천욕 & 저녁 식사</h4>
+                        <p>료칸으로 복귀해 둘만의 프라이빗 노천탕에서 여독을 풀고 롤케이크 디저트와 저녁 즐기기. 온천 후 달콤한 아이스크림 타임!</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Yadoya+Hotaru+Yufuin" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                야도야 호타루 료칸
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 1 체크리스트 -->
+            <div class="checklist-container">
+                <div class="checklist-title">
+                    <span>♨️ 유후인 필수 먹거리 & 힐링 버킷리스트</span>
+                    <span class="save-indicator">자동저장 됨</span>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d1_check1">
+                    <label for="d1_check1">온천욕 후 시원한 <strong>유리병 우유 / 커피우유</strong> 자판기에서 뽑아 마시기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d1_check2">
+                    <label for="d1_check2">온천욕 마친 후 차가운 <strong>피노(Pino) or 유키미다이후쿠(찰떡아이스)</strong> 먹기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d1_check3">
+                    <label for="d1_check3">얼음물에 담긴 구슬 톡! <strong>온천 라무네 사이다</strong> 마시기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d1_check4">
+                    <label for="d1_check4"><strong>비스피크(B-speak)</strong> 폭신한 플레인 롤케이크 맛보기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d1_check5">
+                    <label for="d1_check5">동화마을 <strong>플로럴 빌리지</strong>에서 인생 커플샷 남기기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d1_check6">
+                    <label for="d1_check6">겉바속촉 <strong>금상 고로케</strong> (오리지널 or 치즈)</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d1_check7">
+                    <label for="d1_check7"><strong>미르히(Milch)</strong> 부드러운 푸딩 & 컵 치즈케이크</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d1_check8">
+                    <label for="d1_check8"><strong>허니비(Bee Honey)</strong> 달콤한 벌꿀 소프트아이스크림</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Day 2 콘텐츠 -->
+        <div class="tab-view">
+            <div class="section-header">
+                <span class="section-header-title">🏮 Day 2 : 모모치 해변 & 캐널시티·이자카야</span>
+            </div>
+            <div class="schedule-list">
+                <!-- 1. 존크 호텔 하카타 -->
+                <div class="schedule-item" data-lat="33.5862" data-lng="130.4239" data-name="숙소: 존크 호텔 하카타">
+                    <span class="time-badge">09:30 - 12:00</span>
+                    <div class="item-box">
+                        <h4>유후인 출발 ➔ 하카타 존크 호텔 체크인</h4>
+                        <p>고속버스로 하카타역 도착 후 둘째 날 숙소인 <span class="tag-highlight">'존크 호텔 하카타'</span>에 짐 보관.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Hakata+Bus+Terminal" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                하카타 버스터미널
+                            </a>
+                            <a href="https://maps.google.com/?q=ZONK+HOTEL+HAKATA" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                숙소: 존크 호텔 하카타
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 라멘 점심 -->
+                <div class="schedule-item" data-lat="33.5898" data-lng="130.4194" data-name="신신라멘 (KITTE 하카타)">
+                    <span class="time-badge">12:30 - 13:45</span>
+                    <div class="item-box">
+                        <h4>하카타 돈코츠 라멘 점심</h4>
+                        <p>하카타역 바로 옆 <span class="tag-highlight">'신신라멘'</span> 또는 <span class="tag-highlight">'이치란'</span>에서 든든한 라멘 식사.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Hakata+Shin-Shin+KITTE+Hakata" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                신신라멘 KITTE하카타
+                            </a>
+                            <a href="https://maps.google.com/?q=Ichiran+Hakata+Sunplaza+Underground" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                이치란 하카타역점
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 모모치 해변 & 후쿠오카 타워 -->
+                <div class="schedule-item" data-lat="33.5936" data-lng="130.3516" data-name="모모치 해변 & 후쿠오카 타워">
+                    <span class="time-badge">14:15 - 16:30</span>
+                    <div class="item-box">
+                        <h4>🌊 모모치 해변공원 & 후쿠오카 타워</h4>
+                        <p>이국적인 분위기의 <span class="tag-highlight">모모치 해변(마리존)</span>과 <span class="tag-highlight">후쿠오카 타워</span>에서 시원한 바닷바람과 함께 커플 사진 촬영!</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Momochi+Seaside+Park" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                모모치 해변공원
+                            </a>
+                            <a href="https://maps.google.com/?q=Fukuoka+Tower" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                후쿠오카 타워
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. 캐널시티 하카타 & 몬치치 -->
+                <div class="schedule-item" data-lat="33.5897" data-lng="130.4108" data-name="캐널시티 하카타 (몬치치 쇼핑)">
+                    <span class="time-badge">17:00 - 18:45</span>
+                    <div class="item-box">
+                        <h4>🛍️ 캐널시티 하카타: 음악 분수쇼 & 지하 1층 몬치치(Monchhichi)</h4>
+                        <p>도심으로 복귀해 캐널시티 운하에서 화려한 <span class="tag-highlight">음악 분수쇼</span>를 감상하고, <span class="tag-highlight">지하 1층(B1F) 캐릭터 숍</span>에 들러 귀여운 <strong>몬치치 인형</strong> 쇼핑하기! 석양빛 도는 나카스 강변을 따라 이자카야로 산책.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Canal+City+Hakata" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                캐널시티 하카타
+                            </a>
+                            <a href="https://maps.google.com/?q=Nakasu+River+Cruise+Fukuoka" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                나카스 강변 산책로
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. 이자카야 -->
+                <div class="schedule-item" data-lat="33.5878" data-lng="130.4045" data-name="토리카와 스이쿄우 (이자카야)">
+                    <span class="time-badge">19:15 - 21:15</span>
+                    <div class="item-box">
+                        <h4>로컬 감성 이자카야 (야키토리 & 나베)</h4>
+                        <p>나카스/텐진의 분위기 좋은 이자카야(<span class="tag-highlight">토리카와 스이쿄우</span> 등)에서 겉바속촉 닭껍질 꼬치와 생맥주 & 하이볼!</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Torikawa+Suikyou+Fukuoka" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                토리카와 스이쿄우
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. 돈키호테 나카스 본점 -->
+                <div class="schedule-item" data-lat="33.5933" data-lng="130.4057" data-name="돈키호테 나카스점 (본점)">
+                    <span class="time-badge">21:30 - 23:30</span>
+                    <div class="item-box">
+                        <h4>돈키호테 나카스 본점 심야 쇼핑</h4>
+                        <p>이자카야 바로 옆 24시간 나카스 본점에서 면세 쇼핑(산토리 위스키, 화장품, 일본 간식 득템) 후 존크 호텔 복귀.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Don+Quijote+Nakasu+Fukuoka" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                돈키호테 나카스점 (본점)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 2 체크리스트 -->
+            <div class="checklist-container">
+                <div class="checklist-title">
+                    <span>🏮 도심 핫플 & 쇼핑 체크리스트</span>
+                    <span class="save-indicator">자동저장 됨</span>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d2_check1">
+                    <label for="d2_check1">캐널시티 B1F에서 귀여운 <strong>몬치치(Monchhichi) 인형</strong> 득템하기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d2_check2">
+                    <label for="d2_check2">이자카야에서 <strong>토리카와(닭껍질 꼬치) & 시원한 생맥주</strong> 한잔</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d2_check3">
+                    <label for="d2_check3">편의점에서 <strong>오하요 쟈지푸딩(저지우유 푸딩)</strong> 사먹기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d2_check4">
+                    <label for="d2_check4">돈키호테 나카스 본점에서 <strong>산토리 가쿠빈 위스키 & 면세 쇼핑</strong></label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d2_check5">
+                    <label for="d2_check5">밤 숙소 야식으로 <strong>로손 모찌롤 & 타마고 샌드위치</strong> 즐기기</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Day 3 콘텐츠 -->
+        <div class="tab-view">
+            <div class="section-header">
+                <span class="section-header-title">🌸 Day 3 : 정갈한 정원 & 아쉬운 작별</span>
+            </div>
+            <div class="schedule-list">
+                <!-- 1. 오호리 공원 -->
+                <div class="schedule-item" data-lat="33.5855" data-lng="130.3764" data-name="오호리 공원 & 일본 정원">
+                    <span class="time-badge">10:30 - 12:30</span>
+                    <div class="item-box">
+                        <h4>오호리 공원 & 일본 정원(日本庭園)</h4>
+                        <p>호숫가를 여유롭게 거닐다 푸른 이끼와 연못, 다실이 어우러진 정갈한 일본 정원에서 감성 가득 커플 사진.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Ohori+Park+Japanese+Garden" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                오호리 공원 일본 정원
+                            </a>
+                            <a href="https://maps.google.com/?q=Starbucks+Coffee+Fukuoka+Ohori+Park" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                스타벅스 오호리공원점
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 점심 식사 -->
+                <div class="schedule-item" data-lat="33.5899" data-lng="130.4205" data-name="텐진호르몬 / 모츠나베">
+                    <span class="time-badge">13:00 - 14:30</span>
+                    <div class="item-box">
+                        <h4>마지막 특별 점심</h4>
+                        <p>지글지글 철판 곱창구이 <span class="tag-highlight">'텐진호르몬'</span> 또는 따끈하고 진한 <span class="tag-highlight">'모츠나베'</span>로 풍성한 식사.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Tenjin+Horumon+Hakata+Station" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                텐진호르몬 (하카타역점)
+                            </a>
+                            <a href="https://maps.google.com/?q=Hakata+Motsunabe+Oyama+KITTE+Hakata" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                모츠나베 오오야마
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 다이묘 거리 & 백화점 -->
+                <div class="schedule-item" data-lat="33.5870" data-lng="130.3945" data-name="다이묘 거리 & 이와타야 백화점">
+                    <span class="time-badge">15:00 - 17:00</span>
+                    <div class="item-box">
+                        <h4>다이묘 거리 & 백화점 쇼핑</h4>
+                        <p>다이묘 거리 편집숍 탐방 및 이와타야 백화점 둘러보기 후 편의점 간식 쇼핑.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Daimyo+Chuo-ku+Fukuoka" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                다이묘 거리
+                            </a>
+                            <a href="https://maps.google.com/?q=Iwataya+Main+Store+Fukuoka" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                이와타야 백화점
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. 공항 이동 및 출국 -->
+                <div class="schedule-item" data-lat="33.5859" data-lng="130.4507" data-name="후쿠오카 공항 (출국)">
+                    <span class="time-badge">17:30 - 19:40</span>
+                    <div class="item-box">
+                        <h4>후쿠오카 공항 이동 & 출국 수속</h4>
+                        <p>지하철로 공항 이동 후 면세점 쇼핑. 19:40 비행기 탑승.</p>
+                        <div class="map-btn-group" onclick="event.stopPropagation()">
+                            <a href="https://maps.google.com/?q=Fukuoka+Airport+International+Terminal" target="_blank" class="map-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                후쿠오카 공항
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schedule-item" data-lat="37.4602" data-lng="126.4407" data-name="인천국제공항 T2 (도착)">
+                    <span class="time-badge">21:00</span>
+                    <div class="item-box">
+                        <h4>인천공항 제2터미널 도착</h4>
+                        <p>소중하고 낭만적이었던 2박 3일 후쿠오카 여행 마무리!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 3 체크리스트 -->
+            <div class="checklist-container">
+                <div class="checklist-title">
+                    <span>✈️ 출국 전 마지막 먹거리 & 기념품</span>
+                    <span class="save-indicator">자동저장 됨</span>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d3_check1">
+                    <label for="d3_check1">하카타역 <strong>일포르노델미뇽 갓 구운 미니 크로와상</strong> 맛보기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d3_check2">
+                    <label for="d3_check2">바삭하고 짭조름한 <strong>멘타이코(명란) 바게트</strong> 먹기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d3_check3">
+                    <label for="d3_check3">면세점에서 <strong>로이스 생초콜릿 & 도쿄바나나</strong> 기념품 챙기기</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="d3_check4">
+                    <label for="d3_check4">공항 가기 전 <strong>위탁 수하물 15kg</strong> 무게 확인하기</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="tip-box">
+            <div class="tip-box-title">🏮 여행 전 필수 확인 메모</div>
+            <ul>
+                <li><strong>상단 지도 접기/열기:</strong> 상단 바 우측의 [지도 접기/열기] 버튼으로 지도 화면 크기를 조절할 수 있습니다.</li>
+                <li><strong>터치로 위치 이동:</strong> 일정 카드를 손가락으로 터치하면 지도가 즉시 해당 위치로 비행합니다.</li>
+                <li><strong>장소 깃발 라벨:</strong> 지도 위 빨간 핀 위에 장소 이름이 항상 표시되어 한눈에 위치를 파악할 수 있습니다.</li>
+            </ul>
+        </div>
+
+        <div class="footer-kanji">
+            一期一会 ・ 福岡の思い出
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+    // 1. 지도 초기화
+    const map = L.map('travel-map', {
+        zoomControl: false,
+        attributionControl: false
+    }).setView([33.2538, 131.3425], 14);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+    }).addTo(map);
+
+    let markers = [];
+    let isMapCollapsed = false;
+
+    // 지도 열고 닫기 토글 함수
+    function toggleMap() {
+        const container = document.getElementById('travel-map-container');
+        const btn = document.getElementById('map-toggle-btn');
+
+        isMapCollapsed = !isMapCollapsed;
+        if (isMapCollapsed) {
+            container.classList.add('collapsed');
+            btn.innerHTML = '<span>지도 열기</span> <span id="toggle-icon">▼</span>';
+        } else {
+            container.classList.remove('collapsed');
+            btn.innerHTML = '<span>지도 접기</span> <span id="toggle-icon">▲</span>';
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 320);
+        }
+    }
+
+    // 2. 활성 탭 마커 & 깃발(영구 라벨) 등록
+    function refreshMarkersForActiveTab() {
+        markers.forEach(m => map.removeLayer(m.marker));
+        markers = [];
+
+        const activeView = document.querySelector('.tab-view.active');
+        if (!activeView) return;
+
+        const items = activeView.querySelectorAll('.schedule-item[data-lat]');
+        items.forEach((item, index) => {
+            const lat = parseFloat(item.dataset.lat);
+            const lng = parseFloat(item.dataset.lng);
+            const name = item.dataset.name;
+
+            if (lat && lng) {
+                // 원형 핀 마커
+                const marker = L.circleMarker([lat, lng], {
+                    radius: 7,
+                    fillColor: '#B83B32',
+                    color: '#FFFFFF',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.95
+                }).addTo(map);
+
+                // 핀 위에 글씨 항상 표시 (permanent tooltip)
+                marker.bindTooltip(name, {
+                    permanent: true,
+                    direction: 'top',
+                    className: 'map-label-tooltip',
+                    offset: [0, -8]
+                });
+
+                markers.push({ marker, item, lat, lng, name });
+
+                // 일정 박스 클릭 시 지도 이동 이벤트 바인딩
+                item.onclick = function() {
+                    focusLocation(lat, lng, name, marker, item);
+                };
+
+                if (index === 0) {
+                    map.setView([lat, lng], 14);
+                    updateCurrentLocationUI(name, marker, item);
+                }
+            }
+        });
+    }
+
+    function focusLocation(lat, lng, name, marker, item) {
+        if (isMapCollapsed) {
+            toggleMap();
+        }
+        map.flyTo([lat, lng], 15, {
+            duration: 0.7,
+            easeLinearity: 0.25
+        });
+        updateCurrentLocationUI(name, marker, item);
+    }
+
+    function updateCurrentLocationUI(name, activeMarker, activeItem) {
+        document.getElementById('current-location-text').innerText = `📍 ${name}`;
+        
+        // 마커 및 툴팁 스타일 갱신
+        markers.forEach(m => {
+            m.marker.setStyle({
+                radius: 7,
+                fillColor: '#B83B32',
+                fillOpacity: 0.85
+            });
+            const tooltip = m.marker.getTooltip();
+            if (tooltip && tooltip._container) {
+                tooltip._container.classList.remove('active');
+            }
+        });
+
+        if (activeMarker) {
+            activeMarker.setStyle({
+                radius: 11,
+                fillColor: '#E63946',
+                fillOpacity: 1
+            });
+            const tooltip = activeMarker.getTooltip();
+            if (tooltip && tooltip._container) {
+                tooltip._container.classList.add('active');
+            }
+        }
+
+        // 박스 강조 스타일
+        document.querySelectorAll('.schedule-item').forEach(el => el.classList.remove('active-scroll'));
+        if (activeItem) {
+            activeItem.classList.add('active-scroll');
+        }
+    }
+
+    // 3. 스크롤 위치 감지
+    let currentFocusedName = '';
+    const observerOptions = {
+        root: null,
+        rootMargin: '-190px 0px -50% 0px',
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const item = entry.target;
+                const lat = parseFloat(item.dataset.lat);
+                const lng = parseFloat(item.dataset.lng);
+                const name = item.dataset.name;
+
+                if (lat && lng && name !== currentFocusedName) {
+                    currentFocusedName = name;
+                    if (!isMapCollapsed) {
+                        map.flyTo([lat, lng], 14, {
+                            duration: 0.8,
+                            easeLinearity: 0.25
+                        });
+                    }
+                    const targetObj = markers.find(m => m.name === name);
+                    updateCurrentLocationUI(name, targetObj ? targetObj.marker : null, item);
+                }
+            }
+        });
+    }, observerOptions);
+
+    function observeItems() {
+        document.querySelectorAll('.schedule-item[data-lat]').forEach(item => {
+            observer.observe(item);
+        });
+    }
+
+    // 4. 탭 전환
     function switchTab(index) {
         const buttons = document.querySelectorAll('.tab-btn');
         const views = document.querySelectorAll('.tab-view');
 
         buttons.forEach((btn, i) => {
-            if (i === index) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            if (i === index) btn.classList.add('active');
+            else btn.classList.remove('active');
         });
 
         views.forEach((view, i) => {
-            if (i === index) {
-                view.classList.add('active');
-            } else {
-                view.classList.remove('active');
-            }
+            if (i === index) view.classList.add('active');
+            else view.classList.remove('active');
         });
+
+        refreshMarkersForActiveTab();
+        map.invalidateSize();
     }
 
+    // 5. 체크리스트 LocalStorage 영구 보존
     const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
-    
     checkboxes.forEach(cb => {
         const saved = localStorage.getItem('fukuoka_cb_' + cb.id);
         if (saved === 'true') {
@@ -882,6 +1199,9 @@
             localStorage.setItem('fukuoka_cb_' + cb.id, cb.checked);
         });
     });
+
+    refreshMarkersForActiveTab();
+    observeItems();
 </script>
 
 </body>
