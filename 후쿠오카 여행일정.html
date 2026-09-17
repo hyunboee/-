@@ -566,6 +566,29 @@
         .leaflet-tooltip-bottom:before {
             border-bottom-color: var(--vermilion) !important;
         }
+    
+        /* 이동 수단 & 소요시간 배지 스타일 */
+        .transport-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 8px 0 12px 14px;
+            font-size: 0.78em;
+            color: var(--matcha);
+            font-weight: 600;
+        }
+
+        .transport-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #EBF2EC;
+            border: 1px solid #C4D7C5;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #3B533C;
+        }
+
     </style>
 </head>
 <body>
@@ -635,29 +658,19 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚌 유후인행 고속버스 직행 70분</span></div>
 
-                <!-- 2. 유후인역 버스센터 도착 -->
-                <div class="schedule-item" data-lat="33.2616" data-lng="131.3556" data-name="🚉 유후인역 앞 버스센터">
-                    <span class="time-badge">14:20 - 14:35</span>
+                <!-- 2. 유후인역 & 호타루 료칸 -->
+                <div class="schedule-item" data-lat="33.2538" data-lng="131.3425" data-name="숙소: 야도야 호타루 료칸">
+                    <span class="time-badge">14:20 - 15:00</span>
                     <div class="item-box">
-                        <h4>🚉 유후인역 앞 버스센터 하차</h4>
-                        <p>고속버스에서 내린 뒤 유후인역 앞 택시 승강장으로 이동합니다 (유후다케 산을 배경으로 도착 인증샷 찰칵!).</p>
+                        <h4>유후인역 도착 ➔ 택시로 '야도야 호타루' 이동</h4>
+                        <p>유후인역 앞 버스센터 하차 후 택시로 감성 료칸 <span class="tag-highlight">'야도야 호타루(宿屋 螢)'</span> 이동 및 체크인, 짐 풀기.</p>
                         <div class="map-btn-group" onclick="event.stopPropagation()">
                             <a href="https://maps.google.com/?q=Yufuin+Station+Bus+Center" target="_blank" class="map-btn">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                                유후인역 앞 버스센터
+                                유후인역 버스센터
                             </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. 숙소: 야도야 호타루 료칸 -->
-                <div class="schedule-item" data-lat="33.2538" data-lng="131.3425" data-name="♨️ 숙소: 야도야 호타루 료칸">
-                    <span class="time-badge">14:35 - 15:10</span>
-                    <div class="item-box">
-                        <h4>🚕 택시로 '야도야 호타루' 이동 & 짐 풀기</h4>
-                        <p>역 앞에서 택시를 타고 료칸으로 이동(약 5~7분 소요). 첫날 숙소인 <span class="tag-highlight">'야도야 호타루(宿屋 螢)'</span>에 체크인하고 가벼운 차림으로 거리 산책 준비!</p>
-                        <div class="map-btn-group" onclick="event.stopPropagation()">
                             <a href="https://maps.google.com/?q=Yadoya+Hotaru+Yufuin" target="_blank" class="map-btn">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                                 숙소: 야도야 호타루
@@ -665,8 +678,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚕 택시 5~7분</span></div>
 
-                <!-- 4. 비스피크 (B-speak) -->
+                <!-- 3. 비스피크 (B-speak) -->
                 <div class="schedule-item" data-lat="33.2652" data-lng="131.3616" data-name="🍰 비스피크 (B-speak)">
                     <span class="time-badge">15:20 - 15:40</span>
                     <div class="item-box">
@@ -680,8 +694,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚶 도보 15분 (거리 입구로 이동)</span></div>
 
-                <!-- 5. 미르히 (Milch) -->
+                <!-- 4. 미르히 (Milch) -->
                 <div class="schedule-item" data-lat="33.2647" data-lng="131.3653" data-name="🍮 미르히 (Milch)">
                     <span class="time-badge">15:45 - 16:05</span>
                     <div class="item-box">
@@ -695,13 +710,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚶 도보 5분</span></div>
 
-                <!-- 6. 허니비 (Bee Honey) -->
+                <!-- 5. 허니비 (Bee Honey) -->
                 <div class="schedule-item" data-lat="33.2648" data-lng="131.3658" data-name="🍦 허니비 (Bee Honey)">
                     <span class="time-badge">16:05 - 16:25</span>
                     <div class="item-box">
                         <h4>🍦 허니비(Bee Honey) 벌꿀 아이스크림</h4>
-                        <p>미르히 바로 맞은편! 진한 홋카이도 원유 소프트아이스크림에 <span class="tag-highlight">'천연 벌꿀'</span>을 듬뿍 얹어주는 감성 디저트.</p>
+                        <p>미르히 바로 맞은편! 진한 홋카이도 원유 소프트아이스크림에 <span class="tag-highlight">천연 천열 벌꿀</span>을 듬뿍 얹어주는 감성 디저트.</p>
                         <div class="map-btn-group" onclick="event.stopPropagation()">
                             <a href="https://maps.google.com/?q=Bee+Honey+Yufuin" target="_blank" class="map-btn">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -710,13 +726,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚶 도보 1분 (옆 건물 2층)</span></div>
 
-                <!-- 7. 유후인 마메시바 카페 -->
+                <!-- 6. 유후인 마메시바 카페 -->
                 <div class="schedule-item" data-lat="33.2655" data-lng="131.3665" data-name="🐕 유후인 마메시바 카페">
                     <span class="time-badge">16:25 - 17:00</span>
                     <div class="item-box">
                         <h4>🐕 유후인 마메시바(미니 시바견) 카페</h4>
-                        <p>허니비 바로 맞은편 인근 2층! 귀여운 스카프를 두른 아기자기한 마메시바들과 교감하며 힐링 타임 (당일 현장 티켓 발권제, 자판기 음료 1잔 포함)[span_13](start_span)[span_13](end_span)[span_14](start_span)[span_14](end_span).</p>
+                        <p>허니비 바로 맞은편 인근 2층! 귀여운 스카프를 두른 아기자기한 마메시바들과 교감하며 힐링 타임 (당일 현장 티켓 발권제, 자판기 음료 1잔 포함).</p>
                         <div class="map-btn-group" onclick="event.stopPropagation()">
                             <a href="https://maps.google.com/?q=Yufuin+Mameshiba+Cafe" target="_blank" class="map-btn">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -725,10 +742,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚶 도보 3~5분</span></div>
 
-                <!-- 8. 금상 고로케 & 플로럴 빌리지 -->
+                <!-- 7. 금상 고로케 & 플로럴 빌리지 -->
                 <div class="schedule-item" data-lat="33.2661" data-lng="131.3678" data-name="🥔 금상고로케 & 플로럴 빌리지">
-                    <span class="time-badge">17:00 - 17:35</span>
+                    <span class="time-badge">16:30 - 17:15</span>
                     <div class="item-box">
                         <h4>🥔 금상 고로케 & 🏰 플로럴 빌리지</h4>
                         <p>전국 1위 바삭한 <span class="tag-highlight">'금상 고로케'</span>를 한 입 베어 물며, 동화 속 오두막 마을인 <span class="tag-highlight">'플로럴 빌리지'</span>에서 인생 커플 사진 남기기!</p>
@@ -744,10 +762,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚶 도보 5분</span></div>
 
-                <!-- 9. 긴린코 호수 & 라무네 -->
+                <!-- 8. 긴린코 호수 & 라무네 -->
                 <div class="schedule-item" data-lat="33.2668" data-lng="131.3712" data-name="🌊 긴린코 호수 (라무네)">
-                    <span class="time-badge">17:35 - 18:15</span>
+                    <span class="time-badge">17:15 - 18:00</span>
                     <div class="item-box">
                         <h4>🌊 긴린코 호수 & 톡 쏘는 온천 라무네 사이다</h4>
                         <p>물안개 피어오르는 낭만 호숫가 산책! 상점가 얼음물에 담가둔 구슬을 톡 눌러 터뜨리는 <span class="tag-highlight">'온천 라무네 사이다'</span> 마시기.</p>
@@ -759,8 +778,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚶 도보 15분 (또는 택시 5분)</span></div>
 
-                <!-- 10. 온천 & 야식 (병우유, 피노/유키미다이후쿠) -->
+                <!-- 9. 온천 & 야식 (병우유, 피노/유키미다이후쿠) -->
                 <div class="schedule-item" data-lat="33.2538" data-lng="131.3425" data-name="🥛 호타루 료칸 온천 (병우유 & 아이스크림)">
                     <span class="time-badge">18:30 - 21:00</span>
                     <div class="item-box">
@@ -784,7 +804,7 @@
                 </div>
                 <div class="check-item">
                     <input type="checkbox" id="d1_check0">
-                    <label for="d1_check0">스카프 맨 귀여운 <strong>마메시바(미니 시바견)</strong>들과 교감하기[span_15](start_span)[span_15](end_span)[span_16](start_span)[span_16](end_span)</label>
+                    <label for="d1_check0">스카프 맨 귀여운 <strong>마메시바(미니 시바견)</strong>들과 교감하기</label>
                 </div>
                 <div class="check-item">
                     <input type="checkbox" id="d1_check1">
@@ -824,7 +844,7 @@
         <!-- Day 2 콘텐츠 -->
         <div class="tab-view">
             <div class="section-header">
-                <span class="section-header-title">🏮 Day 2 : 모모치 해변 & 류우자 와규·캐널시티</span>
+                <span class="section-header-title">🏮 Day 2 : 모모치 해변 & 캐널시티·이자카야</span>
             </div>
             <div class="schedule-list">
                 <!-- 1. 존크 호텔 하카타 -->
@@ -845,6 +865,7 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚶 도보 3~5분</span></div>
 
                 <!-- 2. 라멘 점심 -->
                 <div class="schedule-item" data-lat="33.5898" data-lng="130.4194" data-name="신신라멘 (KITTE 하카타)">
@@ -864,6 +885,7 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚌 하카타역 버스 직행 25~30분</span></div>
 
                 <!-- 3. 모모치 해변 & 후쿠오카 타워 -->
                 <div class="schedule-item" data-lat="33.5936" data-lng="130.3516" data-name="모모치 해변 & 후쿠오카 타워">
@@ -883,13 +905,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚌 버스 이동 20~25분</span></div>
 
                 <!-- 4. 캐널시티 하카타 & 몬치치 -->
                 <div class="schedule-item" data-lat="33.5897" data-lng="130.4108" data-name="캐널시티 하카타 (몬치치 쇼핑)">
                     <span class="time-badge">17:00 - 18:45</span>
                     <div class="item-box">
                         <h4>🛍️ 캐널시티 하카타: 음악 분수쇼 & 지하 1층 몬치치(Monchhichi)</h4>
-                        <p>도심으로 복귀해 캐널시티 운하에서 화려한 <span class="tag-highlight">음악 분수쇼</span>를 감상하고, <span class="tag-highlight">지하 1층(B1F) 캐릭터 숍</span>에 들러 귀여운 <strong>몬치치 인형</strong> 쇼핑하기! 석양빛 도는 나카스 강변을 따라 야키니쿠 류우자로 산책.</p>
+                        <p>도심으로 복귀해 캐널시티 운하에서 화려한 <span class="tag-highlight">음악 분수쇼</span>를 감상하고, <span class="tag-highlight">지하 1층(B1F) 캐릭터 숍</span>에 들러 귀여운 <strong>몬치치 인형</strong> 쇼핑하기! 석양빛 도는 나카스 강변을 따라 이자카야로 산책.</p>
                         <div class="map-btn-group" onclick="event.stopPropagation()">
                             <a href="https://maps.google.com/?q=Canal+City+Hakata" target="_blank" class="map-btn">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -902,28 +925,30 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚶 도보 10~12분 (강변 산책)</span></div>
 
-                <!-- 5. 야키니쿠 류우자 저녁 만찬 -->
-                <div class="schedule-item" data-lat="33.5888" data-lng="130.4053" data-name="🥩 야키니쿠 류우자">
+                <!-- 5. 이자카야 -->
+                <div class="schedule-item" data-lat="33.5878" data-lng="130.4045" data-name="토리카와 스이쿄우 (이자카야)">
                     <span class="time-badge">19:15 - 21:15</span>
                     <div class="item-box">
-                        <h4>🥩 최고급 와규 저녁 만찬: 야키니쿠 류우자 (龍坐)</h4>
-                        <p>하루요시 나카스 강변 인근의 프리미엄 야키니쿠 맛집! 입에서 살살 녹는 <span class="tag-highlight">두툼한 우설(규탄)</span>, 꽃갈비, 살치살과 함께 시원한 나마비루 & 하이볼 건배!</p>
+                        <h4>로컬 감성 이자카야 (야키토리 & 나베)</h4>
+                        <p>나카스/텐진의 분위기 좋은 이자카야(<span class="tag-highlight">토리카와 스이쿄우</span> 등)에서 겉바속촉 닭껍질 꼬치와 생맥주 & 하이볼!</p>
                         <div class="map-btn-group" onclick="event.stopPropagation()">
-                            <a href="https://maps.google.com/?q=Yakiniku+Ryuuza+Fukuoka" target="_blank" class="map-btn">
+                            <a href="https://maps.google.com/?q=Torikawa+Suikyou+Fukuoka" target="_blank" class="map-btn">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                                야키니쿠 류우자 (龍坐)
+                                토리카와 스이쿄우
                             </a>
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚶 도보 7~8분</span></div>
 
                 <!-- 6. 돈키호테 나카스 본점 -->
                 <div class="schedule-item" data-lat="33.5933" data-lng="130.4057" data-name="돈키호테 나카스점 (본점)">
                     <span class="time-badge">21:30 - 23:30</span>
                     <div class="item-box">
                         <h4>돈키호테 나카스 본점 심야 쇼핑</h4>
-                        <p>류우자 바로 인근 24시간 나카스 본점에서 면세 쇼핑(산토리 위스키, 화장품, 일본 간식 득템) 후 존크 호텔 복귀.</p>
+                        <p>이자카야 바로 옆 24시간 나카스 본점에서 면세 쇼핑(산토리 위스키, 화장품, 일본 간식 득템) 후 존크 호텔 복귀.</p>
                         <div class="map-btn-group" onclick="event.stopPropagation()">
                             <a href="https://maps.google.com/?q=Don+Quijote+Nakasu+Fukuoka" target="_blank" class="map-btn">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -946,7 +971,7 @@
                 </div>
                 <div class="check-item">
                     <input type="checkbox" id="d2_check2">
-                    <label for="d2_check2"><strong>야키니쿠 류우자</strong>에서 살살 녹는 와규 우설(규탄) & 생맥주 즐기기</label>
+                    <label for="d2_check2">이자카야에서 <strong>토리카와(닭껍질 꼬치) & 시원한 생맥주</strong> 한잔</label>
                 </div>
                 <div class="check-item">
                     <input type="checkbox" id="d2_check3">
@@ -987,6 +1012,7 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚇 지하철 공항선 10~15분</span></div>
 
                 <!-- 2. 점심 식사 -->
                 <div class="schedule-item" data-lat="33.5899" data-lng="130.4205" data-name="텐진호르몬 / 모츠나베">
@@ -1006,6 +1032,7 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚇 지하철 또는 도보 10분</span></div>
 
                 <!-- 3. 다이묘 거리 & 백화점 -->
                 <div class="schedule-item" data-lat="33.5870" data-lng="130.3945" data-name="다이묘 거리 & 이와타야 백화점">
@@ -1025,6 +1052,7 @@
                         </div>
                     </div>
                 </div>
+                <div class="transport-info"><span class="transport-pill">🚇 지하철 공항선 + 🚌 국제선 무료셔틀 (총 25분)</span></div>
 
                 <!-- 4. 공항 이동 및 출국 -->
                 <div class="schedule-item" data-lat="33.5859" data-lng="130.4507" data-name="후쿠오카 공항 (출국)">
@@ -1085,7 +1113,7 @@
         </div>
 
         <div class="footer-kanji">
-            一期一会 ・ 福岡의思い出
+            一期一会 ・ 福岡の思い出
         </div>
     </div>
 </div>
@@ -1105,69 +1133,6 @@
 
     let markers = [];
     let isMapCollapsed = false;
-    let routeLine = null;
-    let arrowMarkers = [];
-
-    // 동선 화살표 및 경로선 그리기 함수
-    function drawRouteWithArrows(points) {
-        if (routeLine) {
-            map.removeLayer(routeLine);
-            routeLine = null;
-        }
-        arrowMarkers.forEach(a => map.removeLayer(a.marker));
-        arrowMarkers = [];
-
-        if (points.length < 2) return;
-
-        const latlngs = points.map(p => L.latLng(p.lat, p.lng));
-
-        // 1. 점선 이동 경로선
-        routeLine = L.polyline(latlngs, {
-            color: '#B83B32',
-            weight: 3.5,
-            opacity: 0.75,
-            dashArray: '6, 8',
-            lineCap: 'round',
-            lineJoin: 'round'
-        }).addTo(map);
-
-        // 2. 각 경로 구간별 방향 화살표 마커 생성
-        for (let i = 0; i < points.length - 1; i++) {
-            const p1 = latlngs[i];
-            const p2 = latlngs[i + 1];
-            const mid = L.latLng((p1.lat + p2.lat) / 2, (p1.lng + p2.lng) / 2);
-
-            const arrowIcon = createArrowIcon(p1, p2);
-            const arrowMarker = L.marker(mid, { icon: arrowIcon, interactive: false }).addTo(map);
-            arrowMarkers.push({ marker: arrowMarker, p1, p2, mid });
-        }
-    }
-
-    function createArrowIcon(p1, p2) {
-        const pt1 = map.latLngToContainerPoint(p1);
-        const pt2 = map.latLngToContainerPoint(p2);
-        // 화면 좌표계 상에서 방향 각도 산출
-        const angle = Math.atan2(pt2.y - pt1.y, pt2.x - pt1.x) * 180 / Math.PI;
-
-        return L.divIcon({
-            className: 'route-arrow-icon',
-            html: `<div style="transform: rotate(${angle}deg); width:20px; height:20px; display:flex; align-items:center; justify-content:center;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="#B83B32" style="filter: drop-shadow(0 1px 2px rgba(255,255,255,0.95));">
-                        <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" transform="rotate(90 12 12)"/>
-                    </svg>
-                   </div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-        });
-    }
-
-    function updateArrowRotations() {
-        arrowMarkers.forEach(a => {
-            a.marker.setIcon(createArrowIcon(a.p1, a.p2));
-        });
-    }
-
-    map.on('zoomend moveend', updateArrowRotations);
 
     // 지도 열고 닫기 토글 함수
     function toggleMap() {
@@ -1233,11 +1198,6 @@
                 }
             }
         });
-
-        // 활성화된 탭의 일정 순서대로 동선 화살표 연결
-        if (markers.length >= 2) {
-            drawRouteWithArrows(markers);
-        }
     }
 
     function focusLocation(lat, lng, name, marker, item) {
@@ -1286,7 +1246,7 @@
         }
     }
 
-    // 3. 스크롤 위치 감지
+    // 3. 스크런 위치 감지
     let currentFocusedName = '';
     const observerOptions = {
         root: null,
