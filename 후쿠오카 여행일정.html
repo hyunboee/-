@@ -662,7 +662,7 @@
 
                 <!-- 2. 유후인역 & 호타루 료칸 -->
                 <div class="schedule-item" data-lat="33.2538" data-lng="131.3425" data-name="숙소: 야도야 호타루 료칸">
-                    <span class="time-badge">14:20 - 15:00</span>
+                    <span class="time-badge">14:00 - 15:10</span>
                     <div class="item-box">
                         <h4>유후인역 도착 ➔ 택시로 '야도야 호타루' 이동</h4>
                         <p>유후인역 앞 버스센터 하차 후 택시로 감성 료칸 <span class="tag-highlight">'야도야 호타루(宿屋 螢)'</span> 이동 및 체크인, 짐 풀기.</p>
@@ -1133,6 +1133,69 @@
 
     let markers = [];
     let isMapCollapsed = false;
+    let routeLine = null;
+    let arrowMarkers = [];
+
+    // 동선 화살표 및 경로선 그리기 함수
+    function drawRouteWithArrows(points) {
+        if (routeLine) {
+            map.removeLayer(routeLine);
+            routeLine = null;
+        }
+        arrowMarkers.forEach(a => map.removeLayer(a.marker));
+        arrowMarkers = [];
+
+        if (points.length < 2) return;
+
+        const latlngs = points.map(p => L.latLng(p.lat, p.lng));
+
+        // 1. 점선 이동 경로선
+        routeLine = L.polyline(latlngs, {
+            color: '#B83B32',
+            weight: 3.5,
+            opacity: 0.75,
+            dashArray: '6, 8',
+            lineCap: 'round',
+            lineJoin: 'round'
+        }).addTo(map);
+
+        // 2. 각 경로 구간별 방향 화살표 마커 생성
+        for (let i = 0; i < points.length - 1; i++) {
+            const p1 = latlngs[i];
+            const p2 = latlngs[i + 1];
+            const mid = L.latLng((p1.lat + p2.lat) / 2, (p1.lng + p2.lng) / 2);
+
+            const arrowIcon = createArrowIcon(p1, p2);
+            const arrowMarker = L.marker(mid, { icon: arrowIcon, interactive: false }).addTo(map);
+            arrowMarkers.push({ marker: arrowMarker, p1, p2, mid });
+        }
+    }
+
+    function createArrowIcon(p1, p2) {
+        const pt1 = map.latLngToContainerPoint(p1);
+        const pt2 = map.latLngToContainerPoint(p2);
+        // 화면 좌표계 상에서 방향 각도 산출
+        const angle = Math.atan2(pt2.y - pt1.y, pt2.x - pt1.x) * 180 / Math.PI;
+
+        return L.divIcon({
+            className: 'route-arrow-icon',
+            html: `<div style="transform: rotate(${angle}deg); width:20px; height:20px; display:flex; align-items:center; justify-content:center;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="#B83B32" style="filter: drop-shadow(0 1px 2px rgba(255,255,255,0.95));">
+                        <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" transform="rotate(90 12 12)"/>
+                    </svg>
+                   </div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+    }
+
+    function updateArrowRotations() {
+        arrowMarkers.forEach(a => {
+            a.marker.setIcon(createArrowIcon(a.p1, a.p2));
+        });
+    }
+
+    map.on('zoomend moveend', updateArrowRotations);
 
     // 지도 열고 닫기 토글 함수
     function toggleMap() {
@@ -1198,6 +1261,11 @@
                 }
             }
         });
+
+        // 활성화된 탭의 일정 순서대로 동선 화살표 연결
+        if (markers.length >= 2) {
+            drawRouteWithArrows(markers);
+        }
     }
 
     function focusLocation(lat, lng, name, marker, item) {
@@ -1295,7 +1363,7 @@
 
         views.forEach((view, i) => {
             if (i === index) view.classList.add('active');
-            else view.classList.remove('icon-hidden');
+            else view.classList.remove('active');
         });
 
         refreshMarkersForActiveTab();
